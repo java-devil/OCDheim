@@ -1,0 +1,9 @@
+﻿{
+  "name": "OCDheim",
+  "description": "OCDheim is an opinionated collection of tools hoping to bring 22nd-century-level space laser precision, in full force, from an artificial Moon directly to... your merry Viking settlement 'Stokhölm' 🍻❤️",
+  "version_number": "0.1.0",
+  "website_url": "https://github.com/java-devil/OCDheim",
+  "dependencies": [
+    "ValheimModding-Jotunn-2.7.9"
+  ]
+}
