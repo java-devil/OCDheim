@@ -7,11 +7,11 @@ namespace OCDheim
     // Helper classes for OverlayVisualizerImpls, intented to abstract away unecessary low level complexity.
     public abstract class OverlayVisualizer : MonoBehaviour
     {
-        public static readonly Texture2D remove = AssetUtils.LoadTexture("remove.png");
-        public static readonly Texture2D cross = AssetUtils.LoadTexture("cross.png");
-        public static readonly Texture2D undo = AssetUtils.LoadTexture("undo.png");
-        public static readonly Texture2D redo = AssetUtils.LoadTexture("redo.png");
-        public static readonly Texture2D box = AssetUtils.LoadTexture("box.png");
+        public static Texture2D remove { get { return OCDheim.LoadTextureFromDisk("remove.png"); } }
+        public static Texture2D cross { get { return OCDheim.LoadTextureFromDisk("cross.png"); } }
+        public static Texture2D undo { get { return OCDheim.LoadTextureFromDisk("undo.png"); } }
+        public static Texture2D redo { get { return OCDheim.LoadTextureFromDisk("redo.png"); } }
+        public static Texture2D box { get { return OCDheim.LoadTextureFromDisk("box.png"); } }
 
         protected Overlay primary;
         protected Overlay secondary;
