@@ -4,24 +4,28 @@ using Jotunn.Configs;
 using Jotunn.Entities;
 using Jotunn.Managers;
 using Jotunn.Utils;
+using System.IO;
 using UnityEngine;
 
 namespace OCDheim
 {
     [BepInDependency(Jotunn.Main.ModGuid)]
-    [BepInPlugin("dymek.dev.OCDheim", "OCDheim", "0.1.0")]
+    [BepInPlugin("dymek.dev.OCDheim", "OCDheim", "0.1.1")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
     public class OCDheim : BaseUnityPlugin
-    {
-        public static readonly Texture2D brick1x1 = AssetUtils.LoadTexture("brick_1x1.png");
-        public static readonly Texture2D brick2x1 = AssetUtils.LoadTexture("brick_2x1.png");
-        public static readonly Texture2D brick1x2 = AssetUtils.LoadTexture("brick_1x2.png");
-        public static readonly Texture2D brick4x2 = AssetUtils.LoadTexture("brick_4x2.png");
+    {        
+        private Texture2D brick1x1 { get { return LoadTextureFromDisk("brick_1x1.png"); } }
+        private Texture2D brick2x1 { get { return LoadTextureFromDisk("brick_2x1.png"); } }
+        private Texture2D brick1x2 { get { return LoadTextureFromDisk("brick_1x2.png"); } }
+        private Texture2D brick4x2 { get { return LoadTextureFromDisk("brick_4x2.png"); } }
+        private Harmony harmony { get; } = new Harmony("dymek.OCDheim");
+        private static OCDheim ocdheim { get; set; }
 
-        private readonly Harmony harmony = new Harmony("dymek.OCDheim");
+        public static Texture2D LoadTextureFromDisk(string fileName) => AssetUtils.LoadTexture(Path.Combine(Path.GetDirectoryName(ocdheim.Info.Location), fileName));
 
         public void Awake()
         {
+            ocdheim = this;
             harmony.PatchAll();
             PrefabManager.OnVanillaPrefabsAvailable += AddOCDheimToolPieces;
             PrefabManager.OnVanillaPrefabsAvailable += AddOCDheimBuildPieces;

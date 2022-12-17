@@ -12,6 +12,9 @@ If by publicly releasing this mod I please only one more person of similar needs
 ## HOW to install OCDheim?
 - Ensure [BepInEx](https://valheim.thunderstore.io/package/denikson/BepInExPack_Valheim/) is properly installed
 - Ensure [Jötunn](https://valheim.thunderstore.io/package/ValheimModding/Jotunn/) is properly installed
+- Download OCDheim from your preferred mirror:
+	- [Thunderstore](https://valheim.thunderstore.io/package/javadevils/OCDheim/)
+	- [Nexus Mods](https://www.nexusmods.com/valheim/mods/2087)
 - Extract the contents of the OCDheim .zip file to the BepInEx/plugins subdirectory of your Valheim installation
 	- Typical Windows path: C:/Program Files (x86)/Steam/steamapps/common/Valheim/BepInEx/plugins
 	- Typical Linux path: ~/.steam/debian-installation/steamapps/common/Valheim/BepInEx/plugins
