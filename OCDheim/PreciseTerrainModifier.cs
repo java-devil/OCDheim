@@ -97,6 +97,8 @@ namespace OCDheim
             hMap.WorldToVertex(worldPos, out var xPos, out var yPos);
             Debug.Log($"worldPos: {worldPos}, vertexPos: ({xPos}, {yPos})");
 
+            var tileColor = ResolveColor(paintType);
+            var removeColor = tileColor == Color.black;
             FindExtremums(xPos, worldWidth, out var xMin, out var xMax);
             FindExtremums(yPos, worldWidth, out var yMin, out var yMax);
             for (var x = xMin; x <= xMax; x++)
@@ -104,9 +106,8 @@ namespace OCDheim
                 for (var y = yMin; y <= yMax; y++)
                 {
                     var tileIndex = y * worldWidth + x;
-                    var tileColor = ResolveColor(paintType);
                     paintMask[tileIndex] = tileColor;
-                    modifiedPaint[tileIndex] = true;
+                    modifiedPaint[tileIndex] = !removeColor;
                     Debug.Log($"tilePos: ({x}, {y}), tileIndex: {tileIndex}, tileColor: {tileColor}");
                 }
             }
