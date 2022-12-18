@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace OCDheim
 {
-    [BepInPlugin("dymek.dev.OCDheim", "OCDheim", "0.1.1")]
+    [BepInPlugin("dymek.dev.OCDheim", "OCDheim", "0.1.2")]
     [BepInDependency(Jotunn.Main.ModGuid)]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
     public class OCDheim : BaseUnityPlugin

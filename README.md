@@ -62,7 +62,7 @@ If by publicly releasing this mod I please only one more person of similar needs
 	- Show OCDheim keybinding-tips side by side with Vanilla Valheim keybinding-tips while in Build Mode
 - The Hoe and The Cultivator
 	- Undo & Redo functionality
-	- The Remove Terrain Modifications Tool works as intended on Tar Pits and in The Mistlands
+	- ~~The Remove Terrain Modifications Tool works as intended on Tar Pits and in The Mistlands~~
 	- Visualization of the whole World Grid (as opposed to visualization only of the affected tiles
 	- The Remove Terrain Modifications Tool works on stone formations (think: fixing destroyed plains pillars)
 	- Differentiate Terrain Modification visualization from Terrain Recoloring visualization (they do not overlap) in Tools that do both
