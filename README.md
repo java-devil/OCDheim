@@ -80,6 +80,11 @@ https://github.com/java-devil/OCDheim/issues
 - ...also the Valheim developers for providing us with this, dunno... MASTERPIECE OF A GAME
 - ...and the Jötunn developers for being more helpful than is permissible by law (seriously if you ever decide to mod Valheim - look up their Wiki and their Discord)
 
+## Feedback
+[![Discord](banners/discord.png)](https://discord.com/users/890153569905414144)
+[![GitHub](banners/github.png)](https://github.com/java-devil/OCDheim)
+[![Nexus Mods](banners/nexus.png)](https://www.nexusmods.com/valheim/mods/2087)
+
 ## Donations
 If you enjoy my work please consider a second to donate 😉
 
