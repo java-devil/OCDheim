@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace OCDheim
 {
-    [HarmonyPatch(typeof(Player), "UpdatePlacementGhost")]
+    [HarmonyPatch(typeof(Player), nameof(Player.UpdatePlacementGhost))]
     public static class PreciseBuildPieceSnapper
     {
         private const float NeighbourhoodSize = 3.5f;
@@ -110,11 +110,19 @@ namespace OCDheim
             return rayHit.normal;
         }
 
+        private static void GetAllPiecesInRadius(Vector3 p, float radius, List<Piece> pieces)
+        {
+            foreach (Piece allPiece in Piece.s_allPieces)
+            {
+                if (allPiece.gameObject.layer != Piece.s_ghostLayer && (double) Vector3.Distance(p, allPiece.transform.position) < radius)
+                    pieces.Add(allPiece);
+            }
+        }
         private static List<Piece> FindNeighbourPieces(Vector3 playerPoV)
         {
             neighbourPieces.Clear();
             snappableNeighbourPieces.Clear();
-            Piece.GetAllPiecesInRadius(playerPoV, NeighbourhoodSize, neighbourPieces);
+            GetAllPiecesInRadius(playerPoV, (float)NeighbourhoodSize, neighbourPieces);
             foreach (var neighbourPiece in neighbourPieces)
             {
                 if (neighbourPiece.IsSnappablePiece())
