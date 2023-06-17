@@ -15,7 +15,15 @@ namespace OCDheim
         public Vector3 locPosition { get { return transform.localPosition; } set { transform.localPosition = value; } }
         public Quaternion rotation { get { return transform.rotation; } set { transform.rotation = value; } }
         public Color color { get { ps.GetParticles(particles, 2); return particles[1].GetCurrentColor(ps); } }
-        public Color startColor { get { return ps.startColor; } set { ps.startColor = value; } }
+        public Color startColor
+        {
+            get { return psm.startColor.color; }
+            set
+            {
+                var psmainStartColor = psm.startColor;
+                psmainStartColor.color = value;
+            }
+        }
         public float startSize { get { return psm.startSize.constant; } set { var psMain = ps.main; psMain.startSize = value; } }
         public float startSpeed { get { return psm.startSize.constant; } set { var psMain = ps.main; psMain.startSpeed = value; } }
         public float startLifetime { get { return psm.startLifetime.constant; } set { var psMain = ps.main; psMain.startLifetime = value; } }
