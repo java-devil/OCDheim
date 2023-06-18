@@ -2,7 +2,7 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
    <!-- Needs to be your path to the base Valheim folder -->
-    <VALHEIM_INSTALL>C:\steam\steamapps\common\Valheim</VALHEIM_INSTALL>
+    <VALHEIM_INSTALL>C:\Program Files (x86)\Steam\steamapps\common\Valheim</VALHEIM_INSTALL>
     <!-- This is the folder where your build gets copied to when using the post-build automations -->
     <MOD_DEPLOYPATH>$(VALHEIM_INSTALL)\BepInEx\plugins</MOD_DEPLOYPATH>
   </PropertyGroup>

@@ -38,6 +38,17 @@ namespace OCDheim
             }
         }
 
+        public static void GetAllPiecesInRadius(Vector3 p, float radius, List<Piece> pieces)
+        {
+            if (Piece.s_ghostLayer == 0)
+                Piece.s_ghostLayer = LayerMask.NameToLayer("ghost");
+            foreach (Piece allPiece in Piece.s_allPieces)
+            {
+                if (allPiece.gameObject.layer != Piece.s_ghostLayer && (double)Vector3.Distance(p, allPiece.transform.position) < (double)radius)
+                    pieces.Add(allPiece);
+            }
+        }
+
         private static void SnapToNeighbourPiece(Piece buildPiece, int layerMask)
         {
             var playerPoV = DeterminePlayerPoV(layerMask);
@@ -114,7 +125,7 @@ namespace OCDheim
         {
             neighbourPieces.Clear();
             snappableNeighbourPieces.Clear();
-            Piece.GetAllPiecesInRadius(playerPoV, NeighbourhoodSize, neighbourPieces);
+            GetAllPiecesInRadius(playerPoV, NeighbourhoodSize, neighbourPieces);
             foreach (var neighbourPiece in neighbourPieces)
             {
                 if (neighbourPiece.IsSnappablePiece())

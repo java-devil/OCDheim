@@ -28,7 +28,7 @@ namespace OCDheim
 
         public void RotateToPlayer()
         {
-            var playerXAxisDirection = new Vector3(GameCamera.m_instance.transform.position.x, transform.position.y, GameCamera.m_instance.transform.position.z);
+            var playerXAxisDirection = new Vector3(GameCamera.instance.transform.position.x, transform.position.y, GameCamera.instance.transform.position.z);
             transform.LookAt(playerXAxisDirection, Vector3.up);
             transform.Rotate(90f, 180f, 0f);
         }
