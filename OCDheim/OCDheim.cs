@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using BepInEx.Configuration;
 using HarmonyLib;
 using Jotunn.Configs;
 using Jotunn.Entities;
@@ -10,7 +11,7 @@ using UnityEngine;
 namespace OCDheim
 {
     [BepInDependency(Jotunn.Main.ModGuid)]
-    [BepInPlugin("dymek.dev.OCDheim", "OCDheim", "0.1.2")]
+    [BepInPlugin("dymek.dev.OCDheim", "OCDheim", "0.1.4")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
     public class OCDheim : BaseUnityPlugin
     {        
@@ -21,15 +22,30 @@ namespace OCDheim
         private Harmony harmony { get; } = new Harmony("dymek.OCDheim");
         private static OCDheim ocdheim { get; set; }
 
+        public static ConfigEntry<KeyboardShortcut> configPrecisionModeKeybind;
+        public static ConfigEntry<KeyboardShortcut> configPrecisionModeJoybind;
+        public static ConfigEntry<KeyboardShortcut> configGridModeKeybind;
+        public static ConfigEntry<KeyboardShortcut> configGridModeJoybind;
+
+        private void OCDHeimCreateConfigValues()
+        {
+            configPrecisionModeKeybind = Config.Bind("Keybinds", "PrecisionModeKeybind", new KeyboardShortcut(KeyCode.Z), "The keyboard binding for Precision Mode");
+            configPrecisionModeJoybind = Config.Bind("Keybinds", "PrecisionModeJoybind", new KeyboardShortcut(KeyCode.JoystickButton2), "The joystick binding for Precision Mode");
+            configGridModeKeybind = Config.Bind("Keybinds", "GridModeKeybind", new KeyboardShortcut(KeyCode.LeftAlt), "The keyboard binding for Grid Mode");
+            configGridModeJoybind = Config.Bind("Keybinds", "GridModeJoybind", new KeyboardShortcut(KeyCode.JoystickButton5), "The joystick binding for Grid Mode");
+        }
+
         public static Texture2D LoadTextureFromDisk(string fileName) => AssetUtils.LoadTexture(Path.Combine(Path.GetDirectoryName(ocdheim.Info.Location), fileName));
 
         public void Awake()
         {
             ocdheim = this;
             harmony.PatchAll();
+            OCDHeimCreateConfigValues();
             PrefabManager.OnVanillaPrefabsAvailable += AddOCDheimToolPieces;
             PrefabManager.OnVanillaPrefabsAvailable += AddOCDheimBuildPieces;
             PrefabManager.OnVanillaPrefabsAvailable += ModVanillaValheimTools;
+
         }
 
         private void AddOCDheimToolPieces()
@@ -41,6 +57,10 @@ namespace OCDheim
 
         private void AddToolPiece<TOverlayVisualizer>(string pieceName, string basePieceName, string pieceTable, Texture2D iconTexture, bool level = false, bool raise = false, bool smooth = false, bool paint = false) where TOverlayVisualizer: OverlayVisualizer
         {
+            var pieceExists = PieceManager.Instance.GetPiece(pieceName) != null;
+            if (pieceExists)
+                return;
+
             var pieceIcon = Sprite.Create(iconTexture, new Rect(0, 0, iconTexture.width, iconTexture.height), Vector2.zero);
             var piece = new CustomPiece(pieceName, basePieceName, new PieceConfig
             {
@@ -71,6 +91,10 @@ namespace OCDheim
 
         private void AddBrickBuildPiece(string brickSuffix, Vector3 brickScale, int brickPrice, Texture2D iconTexture)
         {
+            var pieceExists = PieceManager.Instance.GetPiece($"stone_floor_{brickSuffix}") != null;
+            if (pieceExists)
+                return;
+
             var brick = PrefabManager.Instance.CreateClonedPrefab($"stone_floor_{brickSuffix}", "stone_floor_2x2");
             var brickIcon = Sprite.Create(iconTexture, new Rect(0, 0, iconTexture.width, iconTexture.height), Vector2.zero);
             brick.transform.localScale = brickScale;

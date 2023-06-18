@@ -4,7 +4,7 @@ using UnityEngine;
 namespace OCDheim
 {
     [HarmonyPatch(typeof(ZInput), "Load")]
-    public static class Keybindings
+    public class Keybindings
     {
         public const string GridMode = "GridMode";
         public const string NoSnapMode = "AltPlace";
@@ -32,25 +32,50 @@ namespace OCDheim
         public static bool SnapModeEnabled { get { return !ZInput.GetButton(NoSnapMode) && !ZInput.GetButton(JoyNoSnapMode); } }
         public static bool SnapModeDisabled { get { return !SnapModeEnabled; } }
 
+        public static KeyCode PrecisionModeKeycode;
+        public static KeyCode PrecisionModeJoycode;
+        public static KeyCode GridModeKeycode;
+        public static KeyCode GridModeJoycode;
+        public static ZInput ZInstance;
+
         public static void Postfix(ZInput __instance)
         {
-            __instance.AddButton(PrecisionMode, KeyCode.Z);
-            __instance.AddButton(GridMode, KeyCode.LeftAlt);
-            __instance.AddButton(JoyGridMode, KeyCode.JoystickButton5);
-            __instance.AddButton(JoyPrecisionMode, KeyCode.JoystickButton2);
+            ZInstance = __instance;
+            __instance.AddButton(PrecisionMode, OCDheim.configPrecisionModeKeybind.Value.MainKey);
+            __instance.AddButton(JoyPrecisionMode, OCDheim.configPrecisionModeJoybind.Value.MainKey);
+            __instance.AddButton(GridMode, OCDheim.configGridModeKeybind.Value.MainKey);
+            __instance.AddButton(JoyGridMode, OCDheim.configGridModeJoybind.Value.MainKey);
         }
 
         public static void Refresh()
         {
+            if (
+                ZInstance.GetButtonDef(PrecisionMode).m_key != OCDheim.configPrecisionModeKeybind.Value.MainKey
+                || ZInstance.GetButtonDef(JoyPrecisionMode).m_key != OCDheim.configPrecisionModeJoybind.Value.MainKey
+                || ZInstance.GetButtonDef(GridMode).m_key != OCDheim.configGridModeKeybind.Value.MainKey
+                || ZInstance.GetButtonDef(JoyGridMode).m_key != OCDheim.configGridModeJoybind.Value.MainKey
+                )
+            {
+                Debug.Log("Keybind change detected, updating to use new value");
+                ZInstance.Setbutton(PrecisionMode, OCDheim.configPrecisionModeKeybind.Value.MainKey);
+                ZInstance.Setbutton(JoyPrecisionMode, OCDheim.configPrecisionModeJoybind.Value.MainKey);
+                ZInstance.Setbutton(GridMode, OCDheim.configGridModeKeybind.Value.MainKey);
+                ZInstance.Setbutton(JoyGridMode, OCDheim.configGridModeJoybind.Value.MainKey);
+            }
+            
             if (ZInput.GetButtonDown(GridMode) || ZInput.GetButtonDown(JoyGridMode))
             {
                 GridModeEnabled = !GridModeEnabled;
                 gridModeFreshlyEnabled = GridModeEnabled;
                 gridModeFreshlyDisabled = GridModeDisabled;
+                Debug.Log("Grid Mode Toggle: " + GridModeEnabled);
+                Player.m_localPlayer.Message(MessageHud.MessageType.TopLeft,"Grid Mode: " + GridModeEnabled);
             }
             if (ZInput.GetButtonDown(PrecisionMode) || ZInput.GetButtonDown(JoyPrecisionMode))
             {
                 PrecisionModeEnabled = !PrecisionModeEnabled;
+                Debug.Log("Precision Mode Toggle: " + PrecisionModeEnabled);
+                Player.m_localPlayer.Message(MessageHud.MessageType.TopLeft, "Precision Mode: " + PrecisionModeEnabled);
             }
         }
 
