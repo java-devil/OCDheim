@@ -10,7 +10,7 @@ using UnityEngine;
 namespace OCDheim
 {
     [BepInDependency(Jotunn.Main.ModGuid)]
-    [BepInPlugin("dymek.dev.OCDheim", "OCDheim", "0.1.3")]
+    [BepInPlugin("dymek.dev.OCDheim", "OCDheim", "0.1.4")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
     public class OCDheim : BaseUnityPlugin
     {        
@@ -44,23 +44,31 @@ namespace OCDheim
             var pieceExists = PieceManager.Instance.GetPiece(pieceName) != null;
             if (pieceExists)
                 return;
+
+            var pieceIcon = Sprite.Create(new Texture2D(64,64),new Rect(0, 0, 64, 64), Vector2.zero);
             
-            var pieceIcon = Sprite.Create(iconTexture, new Rect(0, 0, iconTexture.width, iconTexture.height), Vector2.zero);
+            if (iconTexture == null)
+            {
+                Debug.LogWarning("OCDHeim: Installation is missing Texture Files.");
+            }
+            else
+            {
+                pieceIcon = Sprite.Create(iconTexture, new Rect(0, 0, iconTexture.width, iconTexture.height), Vector2.zero);    
+            }
+            
             var piece = new CustomPiece(pieceName, basePieceName, new PieceConfig
             {
                 Name = pieceName,
                 Icon = pieceIcon,
                 PieceTable = pieceTable
             });
-
+            
             var settings = piece.PiecePrefab.GetComponent<TerrainOp>().m_settings;
             settings.m_level = level;
             settings.m_raise = raise;
             settings.m_smooth = smooth;
             settings.m_paintCleared = paint;
             piece.PiecePrefab.AddComponent<TOverlayVisualizer>();
-
-            
 
             PieceManager.Instance.AddPiece(piece);
         }
@@ -82,7 +90,19 @@ namespace OCDheim
                 return;
 
             var brick = PrefabManager.Instance.CreateClonedPrefab($"stone_floor_{brickSuffix}", "stone_floor_2x2");
-            var brickIcon = Sprite.Create(iconTexture, new Rect(0, 0, iconTexture.width, iconTexture.height), Vector2.zero);
+            
+            var brickIcon = Sprite.Create(new Texture2D(64,64),new Rect(0, 0, 64, 64), Vector2.zero);
+            
+            if (iconTexture == null)
+            {
+                Debug.LogWarning("OCDHeim: Installation is missing Texture Files.");
+            }
+            else
+            {
+                brickIcon = Sprite.Create(iconTexture, new Rect(0, 0, iconTexture.width, iconTexture.height), Vector2.zero);    
+            }
+
+            
             brick.transform.localScale = brickScale;
 
             var brickConfig = new PieceConfig();
