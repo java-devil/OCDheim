@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace OCDheim
 {
@@ -34,10 +35,10 @@ namespace OCDheim
 
         public static void Postfix(ZInput __instance)
         {
-            __instance.AddButton(PrecisionMode, KeyCode.Z);
-            __instance.AddButton(GridMode, KeyCode.LeftAlt);
-            __instance.AddButton(JoyGridMode, KeyCode.JoystickButton5);
-            __instance.AddButton(JoyPrecisionMode, KeyCode.JoystickButton2);
+            __instance.AddButton(PrecisionMode, Key.Z);
+            __instance.AddButton(GridMode, Key.LeftAlt);
+            __instance.AddButton(JoyGridMode, GamepadInput.DPadRight);
+            __instance.AddButton(JoyPrecisionMode, GamepadInput.DPadUp);
         }
 
         public static void Refresh()
