@@ -381,3 +381,8 @@ Unity/UserSettings/
 Unity/.vscode/
 Unity/*.csproj
 Unity/*.sln
+
+# not the generated thunderstore package
+*/Package/README.md
+*/Package/CHANGELOG.md
+*/*.zip
