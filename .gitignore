@@ -373,3 +373,11 @@ Environment.props
 
 # not the generated dll for thunderstore
 */Package/plugins/*
+
+# not the Unity project's generated files
+Unity/Library/
+Unity/Temp/
+Unity/UserSettings/
+Unity/.vscode/
+Unity/*.csproj
+Unity/*.sln
