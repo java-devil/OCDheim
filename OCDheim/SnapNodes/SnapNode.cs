@@ -1,16 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace OCDheim
 {
-    public struct SnapNode
+    public readonly struct SnapNode : IEquatable<SnapNode>
     {
         public const float OrdinaryPrecisionSplitThreshold = 1.5f;
         public const float SuperiorPrecisionMultiplier = 2.0f;
 
-        public Vector3 position { get; private set; }
-        public Type type { get; private set; }
-        public Precision precision { get; private set; }
+        public Precision precision { get; }
+        private Vector3 position { get; }
+        private Type type { get; }
 
         private static bool ShouldSplitInOrdinaryPrecisionMode(Vector3 prevSnapNode, Vector3 nextSnapNode) => Vector3.Distance(prevSnapNode, nextSnapNode) > OrdinaryPrecisionSplitThreshold;
         private static bool ShouldSplitInSuperiorPrecisionMode(Vector3 prevSnapNode, Vector3 nextSnapNode) => Vector3.Distance(prevSnapNode, nextSnapNode) > OrdinaryPrecisionSplitThreshold / SuperiorPrecisionMultiplier;
@@ -48,7 +49,7 @@ namespace OCDheim
             {
                 var midSnapNode = (snapNodeA + snapNodeB) * 0.5f;
                 snapNodes.Add(new SnapNode(midSnapNode, Type.DERIVED, Precision.ORDINARY));
-                //Debug.Log($"[SPLIT LEVEL {splitLevel++}] Ordinary Precision Child of: {snapNodeA} & {snapNodeB}, is: {midSnapNode}");
+                Logger.Debug(() => $"[SPLIT LEVEL {splitLevel++}] Ordinary Precision Child of: {snapNodeA} & {snapNodeB}, is: {midSnapNode}");
 
                 RecursiveSplitInOrdinaryPrecisionMode(snapNodeA, midSnapNode, snapNodes, splitLevel);
                 RecursiveSplitInOrdinaryPrecisionMode(midSnapNode, snapNodeB, snapNodes, splitLevel);
@@ -65,7 +66,7 @@ namespace OCDheim
             {
                 var midSnapNode = (snapNodeA + snapNodeB) * 0.5f;
                 snapNodes.Add(new SnapNode(midSnapNode, Type.DERIVED, Precision.SUPERIOR));
-                //Debug.Log($"[SPLIT LEVEL {splitLevel++}] Superior Precision Child of: {snapNodeA} & {snapNodeB}, is: {midSnapNode}");
+                Logger.Debug(() => $"[SPLIT LEVEL {splitLevel++}] Superior Precision Child of: {snapNodeA} & {snapNodeB}, is: {midSnapNode}");
 
                 RecursiveSplitInSuperiorPrecisionMode(snapNodeA, midSnapNode, snapNodes, splitLevel);
                 RecursiveSplitInSuperiorPrecisionMode(midSnapNode, snapNodeB, snapNodes, splitLevel);
@@ -74,7 +75,8 @@ namespace OCDheim
 
         public static implicit operator Vector3(SnapNode snapNode) => snapNode.position;
         public override string ToString() => $"{type} Snap Node of {precision} precision: {position}";
-        public override bool Equals(object other) => other is SnapNode snapNode && snapNode.position == position;
+        public override bool Equals(object other) => other is SnapNode snapNode && snapNode.Equals(this);
+        public bool Equals(SnapNode snapNode) => snapNode.position == position;
         public override int GetHashCode() => position.GetHashCode();
     }
 }

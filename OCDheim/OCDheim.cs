@@ -1,35 +1,75 @@
-﻿using BepInEx;
+﻿using System;
+using BepInEx;
 using HarmonyLib;
 using Jotunn.Configs;
 using Jotunn.Entities;
 using Jotunn.Managers;
 using Jotunn.Utils;
+using OCDheim.Utilities;
 using System.IO;
 using UnityEngine;
 
 namespace OCDheim
 {
+    [HarmonyPatch]
     [BepInDependency(Jotunn.Main.ModGuid)]
-    [BepInPlugin("dymek.dev.OCDheim", "OCDheim", "0.1.2")]
+    [BepInPlugin(GUID, Name, Version)]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
     public class OCDheim : BaseUnityPlugin
-    {        
-        private Texture2D brick1x1 { get { return LoadTextureFromDisk("brick_1x1.png"); } }
-        private Texture2D brick2x1 { get { return LoadTextureFromDisk("brick_2x1.png"); } }
-        private Texture2D brick1x2 { get { return LoadTextureFromDisk("brick_1x2.png"); } }
-        private Texture2D brick4x2 { get { return LoadTextureFromDisk("brick_4x2.png"); } }
-        private Harmony harmony { get; } = new Harmony("dymek.OCDheim");
-        private static OCDheim ocdheim { get; set; }
+    {
+        public const string GUID = "dymek.dev.OCDheim";
+        private const string Name = "OCDheim";
+        private const string Version = "0.2.0";
 
-        public static Texture2D LoadTextureFromDisk(string fileName) => AssetUtils.LoadTexture(Path.Combine(Path.GetDirectoryName(ocdheim.Info.Location), fileName));
+        public static AssetBundle resourceBundle { get; } = LoadResourceBundle();
+        private Texture2D brick1x1 { get; } = LoadTextureFromDisk("brick_1x1.png");
+        private Texture2D brick2x1 { get; } = LoadTextureFromDisk("brick_2x1.png");
+        private Texture2D brick1x2 { get; } = LoadTextureFromDisk("brick_1x2.png");
+        private Texture2D brick4x2 { get; } = LoadTextureFromDisk("brick_4x2.png");
+        private Harmony harmony { get; } = new Harmony(GUID);
 
-        public void Awake()
+        private static AssetBundle LoadResourceBundle()
         {
-            ocdheim = this;
+            switch (Application.platform)
+            {
+                case RuntimePlatform.WindowsPlayer:
+                case RuntimePlatform.WindowsEditor:
+                    return AssetUtils.LoadAssetBundleFromResources(Path.Combine("bundle_windows"));
+                case RuntimePlatform.LinuxPlayer:
+                case RuntimePlatform.LinuxEditor:
+                    return AssetUtils.LoadAssetBundleFromResources(Path.Combine("bundle_linux"));
+                case RuntimePlatform.OSXPlayer:
+                case RuntimePlatform.OSXEditor:
+                    return AssetUtils.LoadAssetBundleFromResources(Path.Combine("bundle_osx"));
+                default:
+                    throw new PlatformNotSupportedException();
+            }
+        }
+
+        public static Texture2D LoadTextureFromDisk(string fileName)
+        {
+            var modDir = Path.GetDirectoryName(typeof(OCDheim).Assembly.Location) ?? throw new InvalidOperationException();
+            var fullPath = Path.Combine(modDir,  fileName);
+
+            return AssetUtils.LoadTexture(fullPath);
+        }
+
+        private void Awake()
+        {
             harmony.PatchAll();
+            gameObject.AddComponent<KeyBinder>();
             PrefabManager.OnVanillaPrefabsAvailable += AddOCDheimToolPieces;
             PrefabManager.OnVanillaPrefabsAvailable += AddOCDheimBuildPieces;
             PrefabManager.OnVanillaPrefabsAvailable += ModVanillaValheimTools;
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Player))]
+        [HarmonyPatch(nameof(Player.OnSpawned))]
+        private static void OnPlayerAvailable()
+        {
+            Refresher.Of(PrecisionDrill.groundLevels);
+            Refresher.Of(PrecisionDrill.floorLevels);
         }
 
         private void AddOCDheimToolPieces()
@@ -41,6 +81,9 @@ namespace OCDheim
 
         private void AddToolPiece<TOverlayVisualizer>(string pieceName, string basePieceName, string pieceTable, Texture2D iconTexture, bool level = false, bool raise = false, bool smooth = false, bool paint = false) where TOverlayVisualizer: OverlayVisualizer
         {
+            var pieceExists = PieceManager.Instance.GetPiece(pieceName);
+            if (pieceExists != null) { return; }
+            
             var pieceIcon = Sprite.Create(iconTexture, new Rect(0, 0, iconTexture.width, iconTexture.height), Vector2.zero);
             var piece = new CustomPiece(pieceName, basePieceName, new PieceConfig
             {
@@ -71,16 +114,20 @@ namespace OCDheim
 
         private void AddBrickBuildPiece(string brickSuffix, Vector3 brickScale, int brickPrice, Texture2D iconTexture)
         {
+            var brickName = $"Smooth stone {brickSuffix}";
+            var brickExists = PieceManager.Instance.GetPiece(brickName);
+            if (brickExists != null) { return; }
+            
             var brick = PrefabManager.Instance.CreateClonedPrefab($"stone_floor_{brickSuffix}", "stone_floor_2x2");
             var brickIcon = Sprite.Create(iconTexture, new Rect(0, 0, iconTexture.width, iconTexture.height), Vector2.zero);
             brick.transform.localScale = brickScale;
 
             var brickConfig = new PieceConfig();
-            brickConfig.Name = $"Smooth stone {brickSuffix}";
+            brickConfig.Name = brickName;
             brickConfig.PieceTable = "Hammer";
-            brickConfig.Category = "Building";
+            brickConfig.Category = "HeavyBuild";
             brickConfig.Icon = brickIcon;
-            brickConfig.AddRequirement(new RequirementConfig("Stone", brickPrice, 0, true));
+            brickConfig.AddRequirement(new RequirementConfig("Stone", brickPrice));
 
             PieceManager.Instance.AddPiece(new CustomPiece(brick, false, brickConfig));
         }

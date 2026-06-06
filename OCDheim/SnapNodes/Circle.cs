@@ -3,19 +3,19 @@ using UnityEngine;
 
 namespace OCDheim
 {
-    public class Circle : ISide
+    public readonly struct Circle : ISide
     {
         private const int CircleDivisions = 8;
 
-        public char name { get; private set; }
-        public Vector3 midSnapNode { get; private set; }
-        public Vector2 radial { get; private set; }
+        private char name { get; }
+        private Vector3 midSnapNode { get; }
+        private Vector2 radial { get; }
 
         public Circle(Piece piece, Vector2 radial, char name = 'A')
         {
             this.name = name;
             this.radial = radial;
-            midSnapNode = piece.TopMiddlee();
+            midSnapNode = piece.TopMiddle();
         }
 
         public void FillUp(HashSet<SnapNode> snapNodes)

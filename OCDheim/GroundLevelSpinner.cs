@@ -1,31 +1,43 @@
-﻿using UnityEngine;
+﻿using HarmonyLib;
+using UnityEngine;
+
+using static OCDheim.PlayerHelpers;
 
 namespace OCDheim
 {
-    public static class GroundLevelSpinner
+    public class GroundLevelSpinner
     {
-        public const float MaxSpinner = 1.0f;
-        public const float MinSpinner = 0.0f;
+        public static readonly GroundLevelSpinner RaiseGroundSpinner = new GroundLevelSpinner( 1.0f,  0.0f, 1.0f);
+        public static readonly GroundLevelSpinner LowerGroundSpinner = new GroundLevelSpinner(-0.5f, -1.0f, 0.0f);
+        
+        public float value { get; private set; }
+        private float maxValue { get; }
+        private float minValue { get; }
 
-        public static float value { get; private set; } = 1.0f;
-
-        public static void Refresh()
+        private GroundLevelSpinner(float value , float minValue, float maxValue)
         {
-            var scrollΔ = Keybindings.ScrollΔ();
+            this.value = value;
+            this.minValue = minValue;
+            this.maxValue = maxValue;
+        }
+
+        public void Refresh()
+        {
+            var scrollΔ = KeyBinder.ScrollΔ();
             if (scrollΔ > 0) {
-                up(scrollΔ);
+                Up(scrollΔ);
             }
             if (scrollΔ < 0)
             {
-                down(scrollΔ);
+                Down(scrollΔ);
             }
         }
 
-        private static void up(float scrollΔ)
+        private void Up(float scrollΔ)
         {
-            if (value + scrollΔ > MaxSpinner)
+            if (value + scrollΔ > maxValue)
             {
-                value = MaxSpinner;
+                value = maxValue;
             }
             else
             {
@@ -33,16 +45,34 @@ namespace OCDheim
             }
         }
 
-        private static void down(float scrollΔ)
+        private void Down(float scrollΔ)
         {
-            if (value + scrollΔ < MinSpinner)
+            if (value + scrollΔ < minValue)
             {
-                value = MinSpinner;
+                value = minValue;
             }
             else
             {
                 value = Mathf.Round((value + scrollΔ) * 100) / 100;
             }
+        }
+    }
+
+    [HarmonyPatch]
+    public static class BlockCameraZoom
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(ZInput))]
+        [HarmonyPatch(nameof(ZInput.GetMouseScrollWheel))]
+        public static bool Prefix(ref float __result)
+        {
+            if (player.HasRaiseGroundTerraformToolEquipped())
+            {
+                __result = 0f;
+                return false;
+            }
+
+            return true;
         }
     }
 }

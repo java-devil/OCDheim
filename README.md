@@ -1,9 +1,11 @@
 # OCDheim - DEATH TO EYEBALLING!
-The purpose of this mod is for me, a person suffering from severe OCD and selective perfectionism, to be able to enjoy Valheim in its full Glory™ while keeping noninvasive, consistent and respectful of the intended Valheim experience.  
+The purpose of this mod is for me, a person suffering from severe OCD, to be able to enjoy Valheim in its full Glory™ while keeping noninvasive, consistent and respectful of the intended OG experience.
 
-OCDheim is an opinionated collection of tools hoping to bring 22nd-century-level space laser precision, in full force, from an artificial Moon directly to... your merry Viking settlement "Stokhölm" 🍻❤️
+OCDheim is an opinionated collection of building and terraforming tools that bring 22nd-century-level laser precision to... your merry Viking settlement 'Stokhölm' 🍻❤️
 
-If by publicly releasing this mod I please only one more person of similar needs/preferences/disorders - it was worth it to do so 😊
+Do you bleed from every orifice while trying to eyeball a line of torches, a wall of chests, or pin trophies on a wooden pole?
+Do you suffer a violent seizure while trying to level a ledge?
+Then this is the mod for you.
 
 # Propaganda Movie
 [clickedy-click! click! To Play on YouTube... C'mon clickedy!](https://youtu.be/uBOj1TKbugQ)
@@ -20,53 +22,81 @@ If by publicly releasing this mod I please only one more person of similar needs
 	- Typical Linux path: ~/.steam/debian-installation/steamapps/common/Valheim/BepInEx/plugins
 
 ## WHY install OCDheim?
+
+### ADDITIONAL SNAP POINTS
 - **Furniture Pieces[^1] snap to Construction Pieces![^2]**
-	- Press & hold SHIFT [LB on XBOX controller] to revert to non-snapping behavior (consistent with Construction Piece snapping behavior in Vanilla Valheim)
-	- Furniture Pieces snap to Construction Pieces on arbitrary sides, with arbitrary rotation (as smoothly and intuitively as one could hope... hopefully 😉)
-	- Furniture Pieces also snap to specified other Furniture Pieces (for now: Table, Round Table, Long Heavy Table and Black Marble Table; however I'm open to proposals)
-	- Construction Pieces receive additional Snap Points **UP TO 0.5m PRECISION** WHILE snapping with Furniture Pieces (for example: a 2x2 piece would receive Snap Points not only in the corners, but also in the middle of the sides as well as in the middle of the piece)
-	- **Especially useful when:** you suffer from severe OCD and you bleed from every orifice while trying to eye-ball a line of torches, a wall of chests, or trophies on wooden poles
-- Press ALT [RB on XBOX controller] to toggle GRID MODE
-	- The Hoe and The Cultivator become tools of divine precision
-		- The terrain modification AoE snaps to the World Grid
-		- The terrain modification AoE visualization is razor sharp, with well defined borders, overlayed fully over affected tiles and only over affected tiles
-		- The terrain modification AoE is applied uniformly over the affected tiles (doesn't dissolve closer to the border)
-		- The terrain modification AoE is decreased in order to enable more precise terrain manipulation by the player
-		- The tile position (x, y, h) is overlayed over the terrain modification visualization for convenient reference
-		- **Especially useful when:** You cherish your time in this life 😉 Also... when working with ledges (think: you whish to fully level, pave or cultivate a ledge while not overlapping the slope, or worse still - a different ledge)
-	- Spin the MOUSE SCROLL WHEEL [hold LT & press D-PAD UP or D-PAD DOWN on XBOX controller] while in the Raise Ground Tool to precisely fine-tune the intensity of the effect
-		- **Especially useful when:** the vicinity of your keep is TOO perfect and TOO even for your preference from the extensive use of the Level Ground Tool in GRID MODE 😉
-	- All Build Pieces[^3] snap to the World Grid (as opposed to each other)
-		- **Especially useful when:** building in the open world with no other reference, or laying down the first piece of your build as a reference for other pieces (think: you wish your whole build to lie on the World Grid)
-	- All Cultivator Pieces[^4] snap to the World Grid
-		- **Especially useful when:** well... quickly sowing while utilizing available terrain as efficiently as possible
-- press Z [X on XBOX controller] to toggle PRECISION MODE
-	- Construction Pieces receive further additional Snap Points while snapping with Furniture Pieces (for example: a 4m pole receives 2 Snap Points while snapping with a different Construction Piece, 5 Snap Points while snapping with a Furniture Piece with PRECISION MODE disabled and 9 Snap Points while snapping with a Furniture Piece with PRECISION MODE enabled)
-	- **Construction pieces receive additional Snap Points (UP TO 0.5m PRECISION) while snapping with other Construction Pieces** (for example: a 4m pole receives 2 Snap Points while snapping with a different Construction Piece with PRECISION MODE disabled and 5 Snap Points while snapping with a different Construction Piece with PRECISION MODE enabled)
-	- The Hoe and The Cultivator precision in GRID MODE is unaffected (since the minimal sensible AoE for terrain modification and sowing is a 1x1 tile)
-	- The Build Tool precision in GRID MODE is increased from 1x1 tiles to 0.5x0.5 tiles
-	- The Level Ground Tool fine-tune precision is increased several fold
-- "Remove Terrain Modifications" Tool added to The Hoe
-	- Especially useful when: covering up silver node excavation sites or covering up "one click too many while mining tin" crime sites 😉
-- Aesthetically pleasing "Stone Floor 2x2"j-inspired drop-in alternatives to the Stone Pillar, Stone Wall 1x1, Stone Wall 2x1 and Stone Wall 2x2
+	- if [PRECISION MODE] is DISABLED → insert additional Snap Points every ~1.0m
+		- for example: a 2m x 2m Wood Floor would receive 5 additional Snap Points (not only in the corners, but also in the middle of the sides as well as in the middle of the piece)
+		- for example a 4m Log Pole would receive 3 additional Snap Points
+	- if [PRECISION MODE] is ENABLED  → insert additional Snap Points every ~0.5m
+		- for example: a 2m x 2m Wood Floor would receive 21 additional Snap Points
+		- for example a 4m Log Pole would receive 7 additional Snap Points
+- **Construction Pieces receive additional Snap Points while snapping with other Construction Pieces**
+	- if [PRECISION MODE] is ENABLED  → insert additional Snap Points every ~0.5m
+	- if [PRECISION MODE] is DISABLED → no additional Snap Points
+- Furniture Pieces snap to select other Furniture Pieces
+	- Table
+	- Round Table
+	- Long Heavy Table
+	- Black Marble Table
+	- *I'm open to other proposals*
+
+### GIRD MODE (press `ALT` [`LB` + `RS`] to toggle)
+- **The World Grid is visually imposed over terrain**
+![World Grid](https://github.com/java-devil/OCDheim/blob/main/screenshots/world-grid.png?raw=true)
+- The Hoe and The Cultivator become tools of divine precision
+	- The terrain modification AoE snaps to the World Grid
+	- The terrain modification AoE visualization works under Ground Level (incl. under Sea Level)
+	- The terrain modification AoE visualization is razor sharp, with well-defined borders (visualized FULLY over affected tiles AND ONLY over affected tiles)
+	- The terrain modification AoE is applied uniformly over the affected tiles (doesn't dissolve closer to the border)
+	- The tile position (x, y, h) is overlayed over the terrain modification visualization for player convenience
+	- **Especially useful when:** leveling or cultivating ledges without spilling over slopes or corners
+- `MOUSE WHEEL SCROLL ↑ or ↓` [`LT` + `D-PAD ↑` or `LT` + `D-PAD ↓`] when `Raise Ground` is active to precisely fine-tune the intensity of the effect
+	- **Especially useful when:** the vicinity of your keep is TOO perfect and TOO even from the extensive use of `Level Ground` in GRID MODE 😉
+- All Build Pieces snap to the World Grid (as opposed to other Build Pieces)
+	- **Especially useful when:** laying down the foundation piece of your build so that the whole build resides on the World Grid
+- All Seeds snap to the World Grid
+	- **Especially useful when:** well... quickly sowing while efficiently utilizing available terrain
+
+### PRECISION MODE (press `Z` [`LB` + `X`] to toggle)
+- [Multiple Additional Snap Points](#additional-snap-points)
+- if [GRID MODE] is ALSO enabled + The Hoe    is equipped → no effect (since the minimal sensible AoE for terrain modification is a 1m x 1m tile)
+- if [GRID MODE] is ALSO enabled + The Hammer is equipped → The World Grid density is increased from 1m x 1m tiles to 0.5m x 0.5m tiles
+
+### Remove Terrain Modifications (Hoe Tool)
+**Especially useful when:**
+- re-naturalizing your build
+- covering up silver node excavation sites
+- covering up "one click too many" crime sites 😉
+
+### Vertical Stacking of... Stacks
+- Perhaps somewhat ironically stacks[^3] in Vanilla Valheim do not... well... erm... stack. Well now they do.
+![Vertical Stacks](https://github.com/java-devil/OCDheim/blob/main/screenshots/stacked-stacks.png?raw=true)
+
+### Additional Build Pieces
+- Aesthetically Pleasing "Stone Floor 2x2"-inspired drop-in alternatives to:
+	- Stone Pillar 1x2 (Smooth Stone Pillar)
+	- Stone Wall 1x1 (Smooth Stone Wall 1x1)
+	- Stone Wall 2x1 (Smooth Stone Wall 2x1)
+	- Stone Wall 4x2 (Smooth Stone Wall 4x2)
 
 ## Considered Possible Improvements
-- Configuration file
-	- Functionality toggles
-	- Keybinding overrides
-	- Debug Mode toggle
-- The Hammer
-	- PRECISION MODE increases Snap Points of Construction Pieces (where ordinary mode would work as precision mode works nowadays, and precision mode would work as precision mode works for Furniture Pieces nowadays)
-	- PRECISION MODE increases rotation precision of Build Pieces
-	- Unlock Dvergr Build Pieces to enable full restoration of Dvergr Structures
-	- Show OCDheim keybinding-tips side by side with Vanilla Valheim keybinding-tips while in Build Mode
-- The Hoe and The Cultivator
-	- Undo & Redo functionality
-	- ~~The Remove Terrain Modifications Tool works as intended on Tar Pits and in The Mistlands~~
-	- Visualization of the whole World Grid (as opposed to visualization only of the affected tiles
-	- The Remove Terrain Modifications Tool works on stone formations (think: fixing destroyed plains pillars)
-	- Differentiate Terrain Modification visualization from Terrain Recoloring visualization (they do not overlap) in Tools that do both
-- Visual cues when GRID MODE or PERCISION MODE are enabled
+- Config File
+	- Keybinding Overrides
+	- Functional Toggles
+	- Logging Levels
+	- Min/Max Terrain Modification Depth
+- Add `Smooth Slope` Tool → The Hoe (`MOUSE WHEEL SCROLL ↑ or ↓` to precisely fine-tune the Slope °)
+- if [GRID MODE] is ENABLED + The Cultivator is equipped → visualize The World Grid vs Terrain Type Grid drift (they do not fully overlap)
+- if [GRID MODE] is ENABLED + The Pickaxe is equipped → visualize on The World Grid where The Pickaxe is going to land
+- if [PRECISION MODE] is ENABLED → increase the rotation precision of Build Pieces
+- if [PRECISION MODE] is ENABLED → visualize Snap Points
+- Aesthetically Pleasing Crafting Stations superseed inferior Crafting Stations
+	- Workbench → Artisan Table
+	- Smelter → Blast Furnance
+	- Forge → Black Forge
+- Unlock Dvergr Build Pieces to enable full restoration of Dvergr structures
+- Show OCDheim keybind tips side by side with Vanilla Valheim keybind tips 
 - Performance improvements if proven necessary
 - Revise compatibility issues with other mods
 
@@ -90,7 +120,6 @@ If you enjoy my work please consider a second to donate 😉
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Z8Z3GZVCJ)
 
-[^1]: Everything that is not a Construction Piece (think: a Forge or a Forge Cooler) - corresponds to the Misc Tab, Crafting Tab and Furniture Tab
-[^2]: Everything that is snappable in Vanilla Valheim (think: a Darkwood Pole or a Black Marble Column) - corresponds to the Build Tab
-[^3]: Construction Pieces and Furniture Pieces combined
-[^4]: aka "Seeds" - sorry, couldn't resist 😛
+[^1]: Every Build Piece that is NOT snappable in Vanilla Valheim (think: a Torch, a Forge or a Forge Cooler) - corresponds to the `Misc` `Crafting` and `Furniture` Tabs
+[^2]: Every Build Piece that is snappable in Vanilla Valheim (think: a Wood Floor, a Darkwood Pole or a Black Marble Column) - corresponds to the `Build` and `Heavy Building` Tabs
+[^3]: Every Build Piece suffixed with "Stack" or "Pile". Wood Stack, Corewood Stacks, Finewood Stacks, Bone Stacks, Stone Piles, Coal Piles, Coin Piles...

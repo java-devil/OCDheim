@@ -4,20 +4,20 @@ namespace OCDheim
 {
     public class HoverInfo
     {
-        private GameObject go { get; }
+        private GameObject hoverInfoGo { get; }
         private Transform transform { get; }
         private TextMesh textMesh { get; }
-        public string text { get { return textMesh.text; } set { textMesh.text = value; } }
-        public bool enabled { get { return go.activeSelf; } set { go.SetActive(value); } }
-        public Color color { get { return textMesh.color; } set { textMesh.color = value; } }
+        public bool enabled { get => hoverInfoGo.activeSelf; set  => hoverInfoGo.SetActive(value); }
+        public string text { set => textMesh.text = value; }
+        public Color color { set => textMesh.color = value; }
 
         public HoverInfo(Transform parentTransform)
         {
-            go = new GameObject();
-            go.transform.parent = parentTransform;
-            transform = go.transform;
+            hoverInfoGo = new GameObject();
+            hoverInfoGo.transform.parent = parentTransform;
+            transform = hoverInfoGo.transform;
 
-            textMesh = go.AddComponent<TextMesh>();
+            textMesh = hoverInfoGo.AddComponent<TextMesh>();
             textMesh.transform.localPosition = Vector3.zero;
             //Fix: normalize the secondary VFX scale away from the hoverInfo scale
             textMesh.transform.localScale = new Vector3(0.1f / parentTransform.localScale.x, 0.1f / parentTransform.localScale.y, 0.1f / parentTransform.localScale.z);

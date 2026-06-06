@@ -1,54 +1,71 @@
 ﻿using UnityEngine;
 
+using static OCDheim.GroundLevelSpinner;
+
 namespace OCDheim
 {
     // Minimal classes describing specific VFXs of specific "ToolOps" in a DSL-like form.
     public class LevelGroundOverlayVisualizer : SecondaryEnabledOnGridModePrimaryDisabledOnGridMode
     {
-        protected override void Initialize()
+        protected override void InitializeOverlay()
         {
-            base.Initialize();
+            base.InitializeOverlay();
             SpeedUp(secondary);
             VisualizeTerraformingBounds(secondary);
         }
     }
 
-    public class RaiseGroundOverlayVisualizer : SecondaryEnabledOnGridModePrimaryEnabledAlways
+    public class RaiseGroundOverlayVisualizer : ModifyGroundLevelOverlayVisualizer
     {
-        protected override void Initialize()
+        public RaiseGroundOverlayVisualizer() : base(RaiseGroundSpinner) {}
+    }
+    
+    public class LowerGroundOverlayVisualizer : ModifyGroundLevelOverlayVisualizer
+    {
+        public LowerGroundOverlayVisualizer() : base(LowerGroundSpinner) {}
+    }
+
+    public abstract class ModifyGroundLevelOverlayVisualizer : SecondaryEnabledOnGridModePrimaryEnabledAlways
+    {
+        private const float VanillaValheimOverlayBump = 0.05f;
+
+        private GroundLevelSpinner spinner { get; }
+        
+        protected ModifyGroundLevelOverlayVisualizer(GroundLevelSpinner spinner)
         {
-            base.Initialize();
+            this.spinner = spinner;
+        }
+
+        protected override void InitializeOverlay()
+        {
+            base.InitializeOverlay();
             Freeze(secondary);
-            Freeze(tetriary);
+            Freeze(tertiary);
             VisualizeTerraformingBounds(secondary);
-            VisualizeTerraformingBounds(tetriary);
+            VisualizeTerraformingBounds(tertiary);
         }
 
         protected override void OnRefresh()
         {
             base.OnRefresh();
-            if (Keybindings.GridModeEnabled)
+            if (KeyBinder.gridModeEnabled)
             {
-                GroundLevelSpinner.Refresh();
-                secondary.locPosition = new Vector3(0f, GroundLevelSpinner.value, 0f);
+                spinner.Refresh();
+                secondary.localPosition = new Vector3(0f, spinner.value, 0f);
 
-                if (GroundLevelSpinner.value > 0f)
-                {
-                    hoverInfo.text = $"h: +{secondary.locPosition.y:0.00}";
-                }
-                else
-                {
-                    hoverInfo.text = $"x: {secondary.position.x:0}, y: {secondary.position.z:0}, h: {secondary.position.y:0.00000}";
-                }
+                hoverInfo.text = spinner.value > 0f
+                    ? $"h: {secondary.worldPosition.y+VanillaValheimOverlayBump:0.00}\n(+{secondary.localPosition.y:0.00})"
+                    : $"x: {secondary.worldPosition.x:0}, y: {secondary.worldPosition.z:0}\nh: {secondary.worldPosition.y+VanillaValheimOverlayBump:0.00}";
             }
-            tetriary.enabled = Keybindings.GridModeEnabled;
+            tertiary.enabled = KeyBinder.gridModeEnabled;
         }
     }
+
     public class PaveRoadOverlayVisualizer : SecondaryEnabledOnGridModePrimaryDisabledOnGridMode
     {
-        protected override void Initialize()
+        protected override void InitializeOverlay()
         {
-            base.Initialize();
+            base.InitializeOverlay();
             SpeedUp(secondary);
             VisualizeRecoloringBounds(secondary);
         }
@@ -65,40 +82,32 @@ namespace OCDheim
 
     public class SeedGrassOverlayVisualizer : SecondaryEnabledOnGridModePrimaryEnabledAlways
     {
-        protected override void Initialize()
+        protected override void InitializeOverlay()
         {
-            base.Initialize();
+            base.InitializeOverlay();
             Freeze(secondary);
             VisualizeRecoloringBounds(secondary);
-            primary.locPosition = new Vector3(0, 2.0f, 0);
+            primary.localPosition = new Vector3(0.0f, 2.0f, 0.0f);
+            secondary.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
         }
 
         protected override void OnRefresh()
         {
-            if (Keybindings.GridModeEnabled)
-            {
-                primary.startSize = 4.0f;
-                primary.locPosition = new Vector3(0.5f, 2.5f, 0.5f);
-            }
-            else
-            {
-                primary.startSize = 5.5f;
-                primary.locPosition = new Vector3(0, 2.5f, 0);
-            }
             base.OnRefresh();
+            primary.startSize = KeyBinder.gridModeEnabled ? 4.0f : 5.5f;
         }
+
         protected override void OnEnableGrid()
         {
             base.OnEnableGrid();
             primary.enabled = false;
             primary.startSize = 4.0f;
-            primary.locPosition = new Vector3(0.5f, 2.5f, 0.5f);
             primary.enabled = true;
         }
+
         protected override void OnDisableGrid()
         {
             primary.enabled = false;
-            primary.locPosition = new Vector3(0, 2.5f, 0);
             primary.startSize = 5.5f;
             primary.enabled = true;
             base.OnDisableGrid();
@@ -107,31 +116,38 @@ namespace OCDheim
 
     public class RemoveModificationsOverlayVisualizer : SecondaryAndPrimaryEnabledAlways
     {
-        protected override void Initialize()
+        protected override void InitializeOverlay()
         {
             Freeze(primary);
             SpeedUp(secondary);
             VisualizeTerraformingBounds(primary);
             VisualizeIconInsideTerraformingBounds(secondary, cross);
         }
+        
+        protected override void OnRefresh()
+        {
+            base.OnRefresh();
+            ScaleVertically(primary);
+            ScaleVertically(secondary);
+        }
     }
 
     public abstract class UndoRedoModificationsOverlayVisualizer : SecondaryAndPrimaryEnabledAlways
     {
-        protected override void Initialize()
+        protected override void InitializeOverlay()
         {
             Freeze(primary);
             Freeze(secondary);
             VisualizeRecoloringBounds(primary);
-            VisualizeIconInsideRecoloringBounds(secondary, icon());
+            VisualizeIconInsideRecoloringBounds(secondary, Icon());
         }
 
-        protected abstract Texture2D icon();
+        protected abstract Texture2D Icon();
     }
 
     public class UndoModificationsOverlayVisualizer : UndoRedoModificationsOverlayVisualizer
     {
-        protected override Texture2D icon()
+        protected override Texture2D Icon()
         {
             return undo;
         }
@@ -139,7 +155,7 @@ namespace OCDheim
 
     public class RedoModificationsOverlayVisualizer : UndoRedoModificationsOverlayVisualizer
     {
-        protected override Texture2D icon()
+        protected override Texture2D Icon()
         {
             return redo;
         }
