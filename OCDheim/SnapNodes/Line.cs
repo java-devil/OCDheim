@@ -3,11 +3,12 @@ using UnityEngine;
 
 namespace OCDheim
 {
-    public struct Line : ISide
+    public readonly struct Line : ISide
     {
-        public char name { get; private set; }
-        public Vector3 minSnapNode { get; private set; }
-        public Vector3 maxSnapNode { get; private set; }
+        private char name { get; }
+        private Vector3 minSnapNode { get; }
+        private Vector3 maxSnapNode { get; }
+
         public void FillUp(HashSet<SnapNode> snapNodes) => SnapNode.RecursiveSplit(minSnapNode, maxSnapNode, snapNodes);
 
         public Line(char name, Vector3 minSnapNode, Vector3 maxSnapNode)

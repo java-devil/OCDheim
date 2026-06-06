@@ -4,14 +4,16 @@ using UnityEngine;
 
 namespace OCDheim
 {
-    public struct Box : ISide
+    public readonly struct Box : ISide
     {
-        public char name { get; private set; }
-        public Vector3 minMinSnapNode { get; private set; }
-        public Vector3 minMaxSnapNode { get; private set; }
-        public Vector3 maxMinSnapNode { get; private set; }
-        public Vector3 maxMaxSnapNode { get; private set; }
-        private SnapNode.Type primarySnapNodeType { get; set; }
+        private const double Epsilon = 1e-8;
+        
+        private char name { get; }
+        private Vector3 minMinSnapNode { get; }
+        private Vector3 minMaxSnapNode { get; }
+        private Vector3 maxMinSnapNode { get; }
+        private Vector3 maxMaxSnapNode { get; }
+        private SnapNode.Type primarySnapNodeType { get; }
 
         public Box(char name, Vector3 minMinSnapNode, Vector3 minMaxSnapNode, Vector3 maxMinSnapNode, Vector3 maxMaxSnapNode)
         {
@@ -26,7 +28,7 @@ namespace OCDheim
         public Box(Piece piece, Vector2 shift, char name = 'A')
         {
             this.name = name;
-            var topMidSnapNode = piece.TopMiddlee();
+            var topMidSnapNode = piece.TopMiddle();
             minMinSnapNode = topMidSnapNode + piece.transform.rotation * new Vector3(-shift.x, 0.0f, -shift.y);
             minMaxSnapNode = topMidSnapNode + piece.transform.rotation * new Vector3(-shift.x, 0.0f, +shift.y);
             maxMinSnapNode = topMidSnapNode + piece.transform.rotation * new Vector3(+shift.x, 0.0f, -shift.y);
@@ -38,8 +40,8 @@ namespace OCDheim
         {
             var dimensionX = minMaxSnapNode - minMinSnapNode;
             var dimensionY = maxMinSnapNode - minMinSnapNode;
-            (var xΔ, var splitsOfDimensionX) = RecursiveSplit(dimensionX);
-            (var yΔ, var splitsOfDimensionY) = RecursiveSplit(dimensionY);
+            var (xΔ, splitsOfDimensionX) = RecursiveSplit(dimensionX);
+            var (yΔ, splitsOfDimensionY) = RecursiveSplit(dimensionY);
             var snapNodesInDimensionA = Math.Pow(2, splitsOfDimensionX) + 1;
             var snapNodesInDimensionB = Math.Pow(2, splitsOfDimensionY) + 1;
             for (var i = 0; i < snapNodesInDimensionA; i++)
@@ -47,7 +49,7 @@ namespace OCDheim
                 for (var j = 0; j < snapNodesInDimensionB; j++)
                 {
                     var position = minMinSnapNode + xΔ * i + yΔ * j;
-                    if ((i == 0 || i == snapNodesInDimensionA - 1) && (j == 0 || j == snapNodesInDimensionB - 1))
+                    if ((i == 0 || Math.Abs(i - (snapNodesInDimensionA - 1)) < Epsilon) && (j == 0 || Math.Abs(j - (snapNodesInDimensionB - 1)) < Epsilon))
                     {
                         snapNodes.Add(new SnapNode(position, primarySnapNodeType, SnapNode.Precision.ORDINARY));
                     }
@@ -69,10 +71,8 @@ namespace OCDheim
             {
                 return RecursiveSplit(dimensionΔ * 0.5f, ++splitLevel);
             }
-            else
-            {
-                return (dimensionΔ, splitLevel);
-            }
+
+            return (dimensionΔ, splitLevel);
         }
 
         public override string ToString() => $"Box {name}: ({minMinSnapNode}, {minMaxSnapNode}, {maxMinSnapNode}, {maxMaxSnapNode})";
