@@ -1,7 +1,7 @@
 ﻿{
   "name": "OCDheim",
-  "description": "OCDheim is an opinionated collection of building and terraforming tools that bring 22nd-century-level laser precision to... your merry Viking settlement 'Stokhölm' 🍻❤️",
-  "version_number": "0.2.0",
+  "description": "OCDheim is an opinionated collection of building and terraforming tools that bring 22nd-century-level laser precision to... your merry Viking settlement of 'Stokhölm' 🍻❤️",
+  "version_number": "0.2.1",
   "website_url": "https://github.com/java-devil/OCDheim",
   "dependencies": [
     "ValheimModding-Jotunn-2.29.0"

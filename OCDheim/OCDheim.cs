@@ -12,7 +12,7 @@ namespace OCDheim
 {
     [BepInPlugin(GUID, Name, Version)]
     [BepInDependency(Jotunn.Main.ModGuid)]
-    [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
+    [NetworkCompatibility(CompatibilityLevel.ServerMustHaveMod, VersionStrictness.Minor)]
     public class OCDheim : BaseUnityPlugin
     {
         public const string GUID = "dymek.dev.OCDheim";
@@ -32,15 +32,18 @@ namespace OCDheim
             {
                 case RuntimePlatform.WindowsPlayer:
                 case RuntimePlatform.WindowsEditor:
+                case RuntimePlatform.WindowsServer:
                     return AssetUtils.LoadAssetBundleFromResources(Path.Combine("bundle_windows"));
                 case RuntimePlatform.LinuxPlayer:
                 case RuntimePlatform.LinuxEditor:
+                case RuntimePlatform.LinuxServer:
                     return AssetUtils.LoadAssetBundleFromResources(Path.Combine("bundle_linux"));
                 case RuntimePlatform.OSXPlayer:
                 case RuntimePlatform.OSXEditor:
+                case RuntimePlatform.OSXServer:
                     return AssetUtils.LoadAssetBundleFromResources(Path.Combine("bundle_osx"));
                 default:
-                    throw new PlatformNotSupportedException();
+                    throw new PlatformNotSupportedException(Application.platform.ToString());
             }
         }
 

@@ -23,7 +23,7 @@ namespace OCDheim
             if (!modifier.m_level && !modifier.m_raise && !modifier.m_smooth && !modifier.m_paintCleared)
             {
                 RemoveTerrainModifications(pos, ___m_hmap, ref ___m_levelDelta, ref ___m_smoothDelta, ref ___m_modifiedHeight);
-                RecolorTerrain(pos, PaintType.Reset, ___m_hmap, ref ___m_paintMask, ref ___m_modifiedPaint);
+                RecolorTerrain(pos, PaintType.Reset, ___m_hmap, ref ___m_paintMask, ref ___m_modifiedPaint, removeColor: true);
             }
             return true;
         }
@@ -99,7 +99,7 @@ namespace OCDheim
             Logger.Debug(() => "[SUCCESS] Raise Terrain Modification");
         }
 
-        public static void RecolorTerrain(Vector3 worldPos, PaintType paintType, Heightmap hMap, ref Color[] paintMask, ref bool[] modifiedPaint)
+        public static void RecolorTerrain(Vector3 worldPos, PaintType paintType, Heightmap hMap, ref Color[] paintMask, ref bool[] modifiedPaint, bool removeColor = false)
         {
             Logger.Info(() => "[INIT] Color Terrain Modification");
 
@@ -113,7 +113,7 @@ namespace OCDheim
             {
                 for (var y = yMin; y <= yMax; y++)
                 {
-                    ApplyColor(x, y, tileColor, ref paintMask, ref modifiedPaint);
+                    ApplyColor(x, y, tileColor, ref paintMask, ref modifiedPaint, removeColor);
                 }
             }
 
@@ -182,11 +182,11 @@ namespace OCDheim
             }
         }
 
-        private static void ApplyColor(int x, int y, Color tileColor, ref Color[] paintMask, ref bool[] modifiedPaint)
+        private static void ApplyColor(int x, int y, Color tileColor, ref Color[] paintMask, ref bool[] modifiedPaint, bool removeColor = false)
         {
             var tileIndex = y * PTilesPerChunk + x;
             paintMask[tileIndex] = tileColor;
-            modifiedPaint[tileIndex] = tileColor != Color.black;
+            modifiedPaint[tileIndex] = !removeColor;
             Logger.Info(() => $"tilePos: ({x}, {y}), tileIndex: {tileIndex}, tileColor: {tileColor}");
         }
     }

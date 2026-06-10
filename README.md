@@ -1,7 +1,7 @@
 # OCDheim - DEATH TO EYEBALLING!
 The purpose of this mod is for me, a person suffering from severe OCD, to be able to enjoy Valheim in its full Glory™ while keeping noninvasive, consistent and respectful of the intended OG experience.
 
-OCDheim is an opinionated collection of building and terraforming tools that bring 22nd-century-level laser precision to... your merry Viking settlement 'Stokhölm' 🍻❤️
+OCDheim is an opinionated collection of building and terraforming tools that bring 22nd-century-level laser precision to... your merry Viking settlement of 'Stokhölm' 🍻❤️
 
 Do you bleed from every orifice while trying to eyeball a line of torches, a wall of chests, or pin trophies on a wooden pole?
 Do you suffer a violent seizure while trying to level a ledge?
@@ -80,6 +80,12 @@ Then this is the mod for you.
 	- Stone Wall 2x1 (Smooth Stone Wall 2x1)
 	- Stone Wall 4x2 (Smooth Stone Wall 4x2)
 
+## Server-Side vs Client-Side Compatibility
+- The Server MUST run OCDheim if ANY Player runs OCDheim[^4]
+- if ALL Players run OCDheim → EVERYONE has FULL ACCESS to OCDheim functionality
+- if ONLY SOME Players run OCDheim → Players who DO NOT run OCDheim have NO ACCESS to OCDheim functionality
+- if ONLY SOME Players run OCDheim → Players who DO run OCDheim MUST refrain[^5] from using [Additional Build Pieces](#additional-build-pieces)
+
 ## Considered Possible Improvements
 - Config File
 	- Keybinding Overrides
@@ -120,6 +126,8 @@ If you enjoy my work please consider a second to donate 😉
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Z8Z3GZVCJ)
 
-[^1]: Every Build Piece that is NOT snappable in Vanilla Valheim (think: a Torch, a Forge or a Forge Cooler) - corresponds to the `Misc` `Crafting` and `Furniture` Tabs
-[^2]: Every Build Piece that is snappable in Vanilla Valheim (think: a Wood Floor, a Darkwood Pole or a Black Marble Column) - corresponds to the `Build` and `Heavy Building` Tabs
-[^3]: Every Build Piece suffixed with "Stack" or "Pile". Wood Stack, Corewood Stacks, Finewood Stacks, Bone Stacks, Stone Piles, Coal Piles, Coin Piles...
+[^1]: Every Build Piece that is NOT snappable in Vanilla Valheim (think: a Torch, a Forge or a Forge Cooler) - corresponds to the `Misc` `Crafting` and `Furniture` Tabs<br>
+[^2]: Every Build Piece that is snappable in Vanilla Valheim (think: a Wood Floor, a Darkwood Pole or a Black Marble Column) - corresponds to the `Build` and `Heavy Building` Tabs<br>
+[^3]: Every Build Piece suffixed with "Stack" or "Pile". Wood Stack, Corewood Stacks, Finewood Stacks, Bone Stacks, Stone Piles, Coal Piles, Coin Piles...<br>
+[^4]: This requirement MAY eventually be partially loosened<br>
+[^5]: There is no way as of now to enforce this Server-Side<br>
