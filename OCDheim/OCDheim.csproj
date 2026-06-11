@@ -101,6 +101,7 @@
   </Target>
 
   <Target Name="PackageRelease" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ProjectDir)Package/plugins"/>
     <Copy SourceFiles="$(SolutionDir)README.md" DestinationFolder="$(ProjectDir)Package" />
     <Copy SourceFiles="$(SolutionDir)CHANGELOG.md" DestinationFolder="$(ProjectDir)Package" />
     <Copy SourceFiles="@(ResourceFiles)" DestinationFiles="$(ProjectDir)Package/plugins/%(RecursiveDir)%(Filename)%(Extension)" />

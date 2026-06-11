@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.2.2
+- Fix: Missed DLL file in release v0.2.1 😉
+
 ## Version 0.2.1
 - Fix: Compatibility with Docker Servers reintroduced
 - Fix: Server + EVERY Player must have OCDheim installed → Server + SOME Players must have OCDheim installed
