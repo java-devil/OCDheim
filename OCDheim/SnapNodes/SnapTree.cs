@@ -145,14 +145,15 @@ namespace OCDheim
         {
             Lines.Clear();
             var lineName = 'A';
-            for (var i = 0; i < piece.PrimarySnapNodes().Count; i++)
+            var snapNodes = piece.PrimarySnapNodes();
+            for (var i = 0; i < snapNodes.Count; i++)
             {
-                var snapNodeA = piece.PrimarySnapNodes()[i];
+                var snapNodeA = snapNodes[i];
                 if (!LiesOnHorizontalMiddle(snapNodeA, piece))
                 {
-                    for (var j = i + 1; j < piece.PrimarySnapNodes().Count; j++)
+                    for (var j = i + 1; j < snapNodes.Count; j++)
                     {
-                        var snapNodeB = piece.PrimarySnapNodes()[j];
+                        var snapNodeB = snapNodes[j];
                         if (!LiesOnHorizontalMiddle(snapNodeB, piece))
                         {
                             var snapMid = (snapNodeA + snapNodeB) * 0.5f;
@@ -181,11 +182,12 @@ namespace OCDheim
         {
             Lines.Clear();
             var lineName = 'A';
-            for (var i = 0; i < piece.PrimarySnapNodes().Count; i++)
+            var snapNodes = piece.PrimarySnapNodes();
+            for (var i = 0; i < snapNodes.Count; i++)
             {
-                for (var j = i + 1; j < piece.PrimarySnapNodes().Count; j++)
+                for (var j = i + 1; j < snapNodes.Count; j++)
                 {
-                    Lines.Add(new Line(lineName++, piece.PrimarySnapNodes()[i], piece.PrimarySnapNodes()[j])); // Ultimate fallback. Surprisingly satisfying approximation of a vast majority of arbitrary pieces.
+                    Lines.Add(new Line(lineName++, snapNodes[i], snapNodes[j])); // Ultimate fallback. Surprisingly satisfying approximation of a vast majority of arbitrary pieces.
                 }
             }
 

@@ -16,7 +16,8 @@ namespace OCDheim
     {
         private static bool ShouldSuppressVanillaValheim() =>
             (KeyBinder.gridModeEnabled && PrecisePieceSnapper.GridModeRequirementsSatisfied()) ||
-            (KeyBinder.snapModeEnabled && PrecisePieceSnapper.SnapModeRequirementsSatisfied());
+            (KeyBinder.snapModeEnabled && PrecisePieceSnapper.SnapModeRequirementsSatisfied()) ||
+            KeyBinder.snapModeDisabled;
         
         [HarmonyTranspiler]
         [HarmonyPatch(typeof(Player))]

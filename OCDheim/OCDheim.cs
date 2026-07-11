@@ -17,11 +17,12 @@ namespace OCDheim
     {
         public const string GUID = "dymek.dev.OCDheim";
         private const string Name = "OCDheim";
-        private const string Version = "0.2.0";
+        private const string Version = "0.2.3";
 
         public static AssetBundle resourceBundle { get; } = LoadResourceBundle();
         private Texture2D brick1x1 { get; } = LoadTextureFromDisk("brick_1x1.png");
         private Texture2D brick2x1 { get; } = LoadTextureFromDisk("brick_2x1.png");
+        private Texture2D brick2x2 { get; } = LoadTextureFromDisk("brick_2x2.png");
         private Texture2D brick1x2 { get; } = LoadTextureFromDisk("brick_1x2.png");
         private Texture2D brick4x2 { get; } = LoadTextureFromDisk("brick_4x2.png");
         private Harmony harmony { get; } = new Harmony(GUID);
@@ -98,19 +99,21 @@ namespace OCDheim
         {
             AddBrickBuildPiece("1x1", new Vector3(0.5f, 1.0f, 0.5f), 3, brick1x1);
             AddBrickBuildPiece("2x1", new Vector3(1.0f, 1.0f, 0.5f), 4, brick2x1);
-            AddBrickBuildPiece("4x2", new Vector3(2.0f, 2.0f, 0.5f), 6, brick4x2);
             AddBrickBuildPiece("1x2", new Vector3(0.5f, 2.0f, 0.5f), 5, brick1x2);
+            AddBrickBuildPiece("4x2", new Vector3(2.0f, 2.0f, 0.5f), 6, brick4x2);
+            AddBrickBuildPiece("2x2 (Vertical)", new Vector3(1.0f, 2.0f, 0.5f), 5, brick2x2);
 
             PrefabManager.OnVanillaPrefabsAvailable -= AddOCDheimBuildPieces;
         }
 
         private void AddBrickBuildPiece(string brickSuffix, Vector3 brickScale, int brickPrice, Texture2D iconTexture)
         {
-            var brickName = $"Smooth stone {brickSuffix}";
+            var brickName = $"Smooth Stone {brickSuffix}";
+            var snakeSuffix = brickSuffix.Replace(" ", "_").Replace("(", "").Replace(")", "").ToLower();
             var brickExists = PieceManager.Instance.GetPiece(brickName);
             if (brickExists != null) { return; }
             
-            var brick = PrefabManager.Instance.CreateClonedPrefab($"stone_floor_{brickSuffix}", "stone_floor_2x2");
+            var brick = PrefabManager.Instance.CreateClonedPrefab($"stone_floor_{snakeSuffix}", "stone_floor_2x2");
             var brickIcon = Sprite.Create(iconTexture, new Rect(0, 0, iconTexture.width, iconTexture.height), Vector2.zero);
             brick.transform.localScale = brickScale;
 

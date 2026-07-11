@@ -27,7 +27,7 @@ namespace OCDheim
         private static bool _gridModeFreshlyEnabled;
         private static bool _gridModeFreshlyDisabled;
 
-        private static bool snapModeDisabled => ZInput.GetButton(SnapModeKey.Name) || ZInput.GetButton(SnapModeJoy.Name);
+        public static bool snapModeDisabled => ZInput.GetButton(SnapModeKey.Name) || ZInput.GetButton(SnapModeJoy.Name);
         public static bool snapModeEnabled => !snapModeDisabled;
 
         public static bool gridModeEnabled

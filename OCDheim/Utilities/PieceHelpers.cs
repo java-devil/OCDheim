@@ -17,28 +17,43 @@ namespace OCDheim
         private static readonly IMemoryRepo<Piece, PieceShape> PieceShapes = new MemoryRepo<Piece, string, PieceShape>(ShapeOf, piece => piece.m_name, byte.MaxValue);
         private static readonly Dictionary<string, Func<Piece, ISide>> Tables = new Dictionary<string, Func<Piece, ISide>>
         {
+            ["$piece_stool"]             = piece => new Box(piece, new Vector2(0.0f, 0.0f)),
             ["$piece_table_oak"]         = piece => new Box(piece, new Vector2(3.0f, 0.8f)),
             ["$piece_blackmarble_table"] = piece => new Box(piece, new Vector2(1.15f, 0.5f)),
             ["$piece_table"]             = piece => new Box(piece, new Vector2(1.1f, 0.475f)),
+            ["$piece_chestbarrel"]       = piece => new Circle(piece, new Vector2(0.0f, 0.0f)),
             ["$piece_table_round"]       = piece => new Circle(piece, new Vector2(1.15f, 0.0f))
         };
 
         private static readonly List<Transform> PrimarySPs = new List<Transform>();
+        private static readonly List<Vector3> FixedAxisSNs = new List<Vector3>();
         private static readonly List<Vector3> PrimarySNs = new List<Vector3>();
-        
+
         public static Bounds Bounds(this Piece piece) => PieceSizes.LookUp(piece);
         public static PieceType Type(this Piece piece) => PieceTypes.LookUp(piece);
         public static PieceShape Shape(this Piece piece) => PieceShapes.LookUp(piece);
         public static ISide TopSide(this Piece piece) => Tables[piece.m_name].Invoke(piece);
         public static bool IsGroundBound(this Piece piece) => piece.m_groundPiece || piece.m_clipGround || piece.m_clipEverything;
 
-        
         public static List<Vector3> PrimarySnapNodes(this Piece piece)
         {
             piece.FlushPrimarySnapNodes();
             piece.PopulatePrimarySnapNodes();
 
             return PrimarySNs;
+        }
+
+        private static List<Vector3> FixedAxisSnapNodes(this Piece piece)
+        {
+            PrimarySPs.Clear();
+            FixedAxisSNs.Clear();
+            piece.GetSnapPoints(PrimarySPs);
+            foreach (var sn in PrimarySPs)
+            {
+                FixedAxisSNs.Add(piece.transform.InverseTransformDirection(sn.position));
+            }
+            
+            return FixedAxisSNs;
         }
 
         private static void FlushPrimarySnapNodes(this Piece _)
@@ -72,19 +87,25 @@ namespace OCDheim
             return new Vector3(piece.transform.position.x, y, piece.transform.position.z);
         }
 
-        private static bool EverySnapNodeLiesOnExtremums(List<Vector3> snapNodes)
+        private static bool EverySnapNodeLiesOnExtremums(List<Vector3> snapNodes, Func<int, int, int, int, int, int, bool> condition)
         {
-            var minimums = SolveMinimumsOf(snapNodes);
-            var maximums = SolveMaximumsOf(snapNodes);
-            foreach (var snapNode in snapNodes)
-            {
-                if (!LiesOnExtremums(snapNode, minimums, maximums))
-                {
-                    return false;
-                }
-            }
-            return true;
+            var minimums = SolveMinimumsOf(FixedAxisSNs);
+            var maximums = SolveMaximumsOf(FixedAxisSNs);
+
+            var (xMin, yMin, zMin) = OccurrencesOf(minimums, snapNodes);
+            var (xMax, yMax, zMax) = OccurrencesOf(maximums, snapNodes);
+            
+            return condition(xMin, xMax, yMin, yMax, zMin, zMax);
         }
+
+        private static bool EverySnapNodeLiesOn2DExtremums(List<Vector3> snapNodes) => EverySnapNodeLiesOnExtremums(snapNodes, (xMinimums, xMaximums, yMinimums, yMaximums, zMinimums, zMaximums) =>
+            (xMinimums == 2 && xMaximums == 2 && yMinimums == 2 && yMaximums == 2  && zMinimums == 4 && zMaximums == 4)
+            || (xMinimums == 2 && xMaximums == 2 && yMinimums == 4 && yMaximums == 4  && zMinimums == 2 && zMaximums == 2)
+            || (xMinimums == 4 && xMaximums == 4 && yMinimums == 2 && yMaximums == 2  && zMinimums == 2 && zMaximums == 2)
+        );
+        
+        private static bool EverySnapNodeLiesOn3DExtremums(List<Vector3> snapNodes) => EverySnapNodeLiesOnExtremums(snapNodes, (xMinimums, xMaximums, yMinimums, yMaximums, zMinimums, zMaximums) =>
+            xMinimums == 4 && xMaximums == 4 && yMinimums == 4 && yMaximums == 4 && zMinimums == 4 && zMaximums == 4);
 
         private static Vector3 SolveMinimumsOf(List<Vector3> snapNodes)
         {
@@ -116,22 +137,19 @@ namespace OCDheim
             return new Vector3(xMax, yMax, zMax);
         }
 
-        private static bool LiesOnExtremums(Vector3 snapNode, Vector3 minimums, Vector3 maximums)
+        private static (int, int, int) OccurrencesOf(Vector3 extremums, List<Vector3> snapNodes)
         {
-            if (!Mathf.Approximately(snapNode.x, minimums.x) && !Mathf.Approximately(snapNode.x, maximums.x))
+            var xs = 0;
+            var ys = 0;
+            var zs = 0;
+            foreach (var sn in snapNodes)
             {
-                return false;
-            }
-            if (!Mathf.Approximately(snapNode.y, minimums.y) && !Mathf.Approximately(snapNode.y, maximums.y))
-            {
-                return false;
-            }
-            if (!Mathf.Approximately(snapNode.z, minimums.z) && !Mathf.Approximately(snapNode.z, maximums.z))
-            {
-                return false;
+                if (Mathf.Approximately(extremums.x, sn.x)) { xs++; }
+                if (Mathf.Approximately(extremums.y, sn.y)) { ys++; }
+                if (Mathf.Approximately(extremums.z, sn.z)) { zs++; }
             }
 
-            return true;
+            return (xs, ys, zs);
         }
         
         private static Bounds BoundsOf(Piece piece)
@@ -146,33 +164,32 @@ namespace OCDheim
         
         private static PieceType TypeOf(Piece piece)
         {
-            var type = TypeOf(piece.PrimarySnapNodes(), piece.m_name);
+            var type = TypeOf(piece, piece.FixedAxisSnapNodes());
             Logger.Debug(() => $"Piece '{piece.m_name}' { piece.transform.position} IS a {type} Piece");
             
             return type;
         }
 
-        private static PieceType TypeOf(List<Vector3> primarySNs, string pieceName)
+        private static PieceType TypeOf(Piece piece, List<Vector3> snapNodes)
         {
-            if (Tables.ContainsKey(pieceName)) { return TABLE; }
-            return primarySNs.Count != 0 ? CONSTRUCTION : FURNITURE;
+            if (Tables.ContainsKey(piece.m_name)) { return TABLE; }
+            return snapNodes.Count != 0 ? CONSTRUCTION : FURNITURE;
         }
         
         private static PieceShape ShapeOf(Piece piece)
         {
-            piece.FlushPrimarySnapNodes();
-            var shape = ShapeOf(piece.PrimarySnapNodes());
+            var shape = ShapeOf(piece.FixedAxisSnapNodes());
             Logger.Debug(() => $"Piece '{piece.m_name}' { piece.transform.position} IS a {shape} Piece");
             
             return shape;
         }
 
-        private static PieceShape ShapeOf(List<Vector3> primarySNs)
+        private static PieceShape ShapeOf(List<Vector3> snapNodes)
         {
-            if (primarySNs.Count == 2) { return LINE; }
-            if (primarySNs.Count == 4 && EverySnapNodeLiesOnExtremums(primarySNs)) { return BOX; }
-            if (primarySNs.Count == 8 && EverySnapNodeLiesOnExtremums(primarySNs)) { return CUBE; }
-            if (primarySNs.Count == 18) { return CYLINDER; } // Mathematically indefensible. However, sufficient with Vanilla Valheim pieces for now ;)
+            if (snapNodes.Count == 2) { return LINE; }
+            if (snapNodes.Count == 4 && EverySnapNodeLiesOn2DExtremums(snapNodes)) { return BOX; }
+            if (snapNodes.Count == 8 && EverySnapNodeLiesOn3DExtremums(snapNodes)) { return CUBE; }
+            if (snapNodes.Count == 18) { return CYLINDER; } // Mathematically indefensible. However, sufficient with Vanilla Valheim pieces for now ;)
 
             return UNDEFINED;
         }

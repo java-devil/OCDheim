@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 0.2.3
+
+### Improvements
+- Minor: Barrels now stack similarly to Stacks & Piles
+- Minor: "Smooth Stone 2x2" Build Piece
+
+### Fixes
+- Fix: `SHIFT` [`LB`] properly DISABLES Snap Mode
+- Fix: Roof Corner Piece Snapping
+- Fix: misc NPE issues
+
 ## Version 0.2.2
 - Fix: Missed DLL file in release v0.2.1 😉
 
@@ -9,9 +20,13 @@
 - Fix: Cultivator + Grass → sows Grass 100% of the time (used to be >99.9%) even if the OG Terrain Type ≠ Grass
 
 ## Version 0.2.0
-- New: [Grid Mode] World Grid Visualization
-- New: [Grid Mode] Stacks & Piles now stack & pile vertically
-- New: [Grid Mode] The Hoe & The Cultivator AoE is visible even under Ground Level
+
+### Improvements
+- Major: [Grid Mode] World Grid Visualization
+- Major: [Grid Mode] Stacks & Piles now stack & pile vertically
+- Major: [Grid Mode] The Hoe & The Cultivator AoE is visible even under Ground Level
+
+### Fixes
 - Fix: Compatibility with Vanilla Valheim v0.221.12 reintroduced
 - Fix: Ground Bound Build Piece Snapping (some Build Pieces used to instantly "explode")
 - Fix: Roof Bound Build Piece Snapping (Build Pieces used to snap deeper than intended)

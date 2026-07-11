@@ -70,15 +70,18 @@ Then this is the mod for you.
 - covering up "one click too many" crime sites 😉
 
 ### Vertical Stacking of... Stacks
-- Perhaps somewhat ironically stacks[^3] in Vanilla Valheim do not... well... erm... stack. Well now they do.
+- Perhaps somewhat ironically stacks[^3] (or piles, or barrels) in Vanilla Valheim do not... well... erm... stack (or pile, or... erm... barrel?)
+
+Well now they do:
 ![Vertical Stacks](https://github.com/java-devil/OCDheim/blob/main/screenshots/stacked-stacks.png?raw=true)
 
 ### Additional Build Pieces
 - Aesthetically Pleasing "Stone Floor 2x2"-inspired drop-in alternatives to:
-	- Stone Pillar 1x2 (Smooth Stone Pillar)
-	- Stone Wall 1x1 (Smooth Stone Wall 1x1)
-	- Stone Wall 2x1 (Smooth Stone Wall 2x1)
-	- Stone Wall 4x2 (Smooth Stone Wall 4x2)
+	- Stone Pillar 1x2 → Smooth Stone Pillar
+	- Stone Wall 1x1 → Smooth Stone Wall 1x1
+	- Stone Wall 2x1 → Smooth Stone Wall 2x1
+	- Stone Wall 4x2 → Smooth Stone Wall 4x2
+    - (_no equivalent_) → Smooth Stone Wall 2x2
 
 ## Server-Side vs Client-Side Compatibility
 - The Server MUST run OCDheim if ANY Player runs OCDheim[^4]
@@ -128,6 +131,6 @@ If you enjoy my work please consider a second to donate 😉
 
 [^1]: Every Build Piece that is NOT snappable in Vanilla Valheim (think: a Torch, a Forge or a Forge Cooler) - corresponds to the `Misc` `Crafting` and `Furniture` Tabs<br>
 [^2]: Every Build Piece that is snappable in Vanilla Valheim (think: a Wood Floor, a Darkwood Pole or a Black Marble Column) - corresponds to the `Build` and `Heavy Building` Tabs<br>
-[^3]: Every Build Piece suffixed with "Stack" or "Pile". Wood Stack, Corewood Stacks, Finewood Stacks, Bone Stacks, Stone Piles, Coal Piles, Coin Piles...<br>
+[^3]: Every Build Piece suffixed with "Stack", "Pile" or "Barrel". Wood Stack, Corewood Stacks, Finewood Stacks, Bone Stacks, Stone Piles, Coal Piles, Coin Piles...<br>
 [^4]: This requirement MAY eventually be partially loosened<br>
 [^5]: There is no way as of now to enforce this Server-Side<br>
