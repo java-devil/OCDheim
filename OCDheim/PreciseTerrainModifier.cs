@@ -113,6 +113,7 @@ namespace OCDheim
             {
                 for (var y = yMin; y <= yMax; y++)
                 {
+                    tileColor.a = ResolveAlpha(hMap, x, y);
                     ApplyColor(x, y, tileColor, ref paintMask, ref modifiedPaint, removeColor);
                 }
             }
@@ -167,18 +168,24 @@ namespace OCDheim
             y = Mathf.FloorToInt(relPos.z / PTileSize);
         }
 
+        private static float ResolveAlpha(Heightmap hMap, int x, int y) => hMap.GetPaintMask(x, y).a;
+
         private static Color ResolveColor(PaintType paintType)
         {
             switch (paintType)
             {
                 case PaintType.Dirt:
-                    return Color.red;
+                    return Heightmap.m_paintMaskDirt;
                 case PaintType.Paved:
-                    return Color.blue;
+                    return Heightmap.m_paintMaskPaved;
                 case PaintType.Cultivate:
-                    return Color.green;
+                    return Heightmap.m_paintMaskCultivated;
+                case PaintType.ClearVegetation:
+                    return Heightmap.m_paintMaskClearVegetation;
+                case PaintType.DeepSnow:
+                    return Heightmap.m_paintMaskDeepSnow;
                 default:
-                    return Color.black;
+                    return Heightmap.m_paintMaskNothing;
             }
         }
 
@@ -197,9 +204,9 @@ namespace OCDheim
         [HarmonyPrefix]
         [HarmonyPatch(typeof(TerrainComp))]
         [HarmonyPatch(nameof(TerrainComp.SmoothTerrain))]
-        private static bool Prefix(Vector3 worldPos, float radius, bool square, float power, TerrainComp __instance, Heightmap ___m_hmap, ref float[] ___m_smoothDelta, ref bool[] ___m_modifiedHeight)
+        private static bool Prefix(Vector3 worldPos, TerrainComp __instance, Heightmap ___m_hmap, ref float[] ___m_smoothDelta, ref bool[] ___m_modifiedHeight)
         {
-            if (ClientSideGridModeOverride.IsGridModeEnabled(radius))
+            if (GridModeOverride.enabled)
             {
                 PreciseTerrainModifier.SmoothenTerrain(worldPos, ___m_hmap, __instance, ref ___m_smoothDelta, ref ___m_modifiedHeight);
                 return false;
@@ -215,11 +222,11 @@ namespace OCDheim
         [HarmonyPrefix]
         [HarmonyPatch(typeof(TerrainComp))]
         [HarmonyPatch(nameof(TerrainComp.RaiseTerrain))]
-        private static bool Prefix(Vector3 worldPos, float radius, float delta, bool square, float power, TerrainComp __instance, Heightmap ___m_hmap, ref float[] ___m_levelDelta, ref float[] ___m_smoothDelta, ref bool[] ___m_modifiedHeight)
+        private static bool Prefix(Vector3 worldPos, TerrainComp __instance, Heightmap ___m_hmap, ref float[] ___m_levelDelta, ref float[] ___m_smoothDelta, ref bool[] ___m_modifiedHeight)
         {
-            if (ClientSideGridModeOverride.IsGridModeEnabled(radius))
+            if (GridModeOverride.enabled)
             {
-                PreciseTerrainModifier.RaiseTerrain(worldPos, ___m_hmap, __instance, delta, ref ___m_levelDelta, ref ___m_smoothDelta, ref ___m_modifiedHeight);
+                PreciseTerrainModifier.RaiseTerrain(worldPos, ___m_hmap, __instance, GridModeOverride.raiseGroundΔ, ref ___m_levelDelta, ref ___m_smoothDelta, ref ___m_modifiedHeight);
                 return false;
             }
 
@@ -233,11 +240,11 @@ namespace OCDheim
         [HarmonyPrefix]
         [HarmonyPatch(typeof(TerrainComp))]
         [HarmonyPatch(nameof(TerrainComp.PaintCleared))]
-        private static bool Prefix(Vector3 worldPos, float radius, PaintType paintType, bool heightCheck, bool apply, Heightmap ___m_hmap, ref Color[] ___m_paintMask, ref bool[] ___m_modifiedPaint)
+        private static bool Prefix(Vector3 worldPos, TerrainOp.Settings settings, Heightmap ___m_hmap, ref Color[] ___m_paintMask, ref bool[] ___m_modifiedPaint)
         {
-            if (ClientSideGridModeOverride.IsGridModeEnabled(radius))
+            if (GridModeOverride.enabled)
             {
-                PreciseTerrainModifier.RecolorTerrain(worldPos, paintType, ___m_hmap, ref ___m_paintMask, ref ___m_modifiedPaint);
+                PreciseTerrainModifier.RecolorTerrain(worldPos, settings.m_paintType, ___m_hmap, ref ___m_paintMask, ref ___m_modifiedPaint);
                 return false;
             }
 
@@ -245,43 +252,82 @@ namespace OCDheim
         }
     }
 
-    // DIRTY HACK: bend the flow to our will with a hijacked "unused" variable. Thus is the life of the modder ;)
     [HarmonyPatch]
-    public static class ClientSideGridModeOverride
+    public static class GridModeOverride
     {
+        private const string RPC = "RPC_ApplyOperation";
+        private const int TailSize = sizeof(int) + 2 * sizeof(float);
+        private static readonly int Marker = "OCDheim.GridMode".GetStableHashCode();
+
+        public static bool enabled { get; private set; }
+        public static float raiseGroundΔ { get; private set; }
+        public static float lowerGroundΔ { get; private set; }
+
         [HarmonyPrefix]
         [HarmonyPatch(typeof(TerrainComp))]
         [HarmonyPatch(nameof(TerrainComp.ApplyOperation))]
-        private static bool Prefix(TerrainOp modifier)
+        private static bool Send(TerrainOp modifier, ZNetView ___m_nview)
         {
-            if (KeyBinder.gridModeEnabled)
+            if (!ShouldOverride(modifier))
             {
-                if (modifier.m_settings.m_smooth)
-                {
-                    modifier.m_settings.m_smoothRadius = float.NegativeInfinity;
-                }
-                if (modifier.m_settings.m_raise && modifier.m_settings.m_raiseDelta >= 0)
-                {
-                    modifier.m_settings.m_raiseRadius = float.NegativeInfinity;
-                    modifier.m_settings.m_raiseDelta = RaiseGroundSpinner.value;
-                }
-                if (modifier.m_settings.m_raise && modifier.m_settings.m_raiseDelta < 0)
-                {
-                    modifier.m_settings.m_raiseDelta = LowerGroundSpinner.value;
-                }
-                if (modifier.m_settings.m_paintCleared)
-                {
-                    modifier.m_settings.m_paintRadius = float.NegativeInfinity;
-                }
+                return true;
             }
 
-            return true;
+            var envelope = new ZPackage();
+            AppendVanillaModifiers(envelope, modifier);
+            AppendOCDheimModifiers(envelope);
+
+            ___m_nview.InvokeRPC(RPC, envelope);
+            return false;
         }
 
-        // DIRTY HACK: This is surely how I will be remembered ;)
-        public static bool IsGridModeEnabled(float radius)
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(TerrainComp))]
+        [HarmonyPatch(nameof(TerrainComp.RPC_ApplyOperation))]
+        private static void Receive([HarmonyArgument("pkg")] ZPackage envelope)
         {
-            return float.IsNegativeInfinity(radius);
+            var tail = envelope.Size() - TailSize;
+            enabled = false;
+            if (tail >= 0)
+            {
+                envelope.SetPos(tail);
+                if (envelope.ReadInt() == Marker)
+                {
+                    enabled = true;
+                    raiseGroundΔ = envelope.ReadSingle();
+                    lowerGroundΔ = envelope.ReadSingle();
+                }
+                envelope.SetPos(0);
+            }
+        }
+
+        private static bool ShouldOverride(TerrainOp modifier) => KeyBinder.gridModeEnabled && IsOCDheim(modifier) && !IsSnow(modifier);
+
+        private static bool IsOCDheim(TerrainOp modifier) => modifier.GetComponent<OverlayVisualizer>();
+
+        private static bool IsSnow(TerrainOp modifier)
+        {
+            var settings = modifier.m_settings;
+            var position = modifier.transform.position;
+            return settings.m_paintCleared && settings.m_paintType == PaintType.Cultivate && WorldGenerator.IsDeepnorth(position.x, position.z);
+        }
+
+        private static void AppendVanillaModifiers(ZPackage envelope, TerrainOp modifier)
+        {
+            envelope.Write(modifier.transform.position);
+            envelope.Write(modifier.m_settings.m_rotation);
+            if (modifier.m_settings.m_rotation)
+            {
+                envelope.Write(modifier.transform.forward);
+            }
+            modifier.m_settings.Serialize(envelope, modifier.gameObject);
+        }
+
+        private static void AppendOCDheimModifiers(ZPackage envelope)
+        {
+            envelope.Write(Marker);
+            envelope.Write(RaiseGroundSpinner.value);
+            envelope.Write(LowerGroundSpinner.value);
         }
     }
 }

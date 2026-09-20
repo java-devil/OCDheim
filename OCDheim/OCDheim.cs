@@ -17,7 +17,7 @@ namespace OCDheim
     {
         public const string GUID = "dymek.dev.OCDheim";
         private const string Name = "OCDheim";
-        private const string Version = "0.2.3";
+        private const string Version = "0.3.0";
 
         public static AssetBundle resourceBundle { get; } = LoadResourceBundle();
         private Texture2D brick1x1 { get; } = LoadTextureFromDisk("brick_1x1.png");
@@ -85,14 +85,15 @@ namespace OCDheim
                 PieceTable = pieceTable
             });
 
-            var settings = piece.PiecePrefab.GetComponent<TerrainOp>().m_settings;
-            settings.m_level = level;
-            settings.m_raise = raise;
-            settings.m_smooth = smooth;
-            settings.m_paintCleared = paint;
+            var toolPiece = piece.PiecePrefab.GetComponent<TerrainOp>();
+            toolPiece.m_settings.m_level = level;
+            toolPiece.m_settings.m_raise = raise;
+            toolPiece.m_settings.m_smooth = smooth;
+            toolPiece.m_settings.m_paintCleared = paint;
             piece.PiecePrefab.AddComponent<TOverlayVisualizer>();
 
             PieceManager.Instance.AddPiece(piece);
+            TerrainOpRegistry.Register(toolPiece);
         }
 
         private void AddOCDheimBuildPieces()

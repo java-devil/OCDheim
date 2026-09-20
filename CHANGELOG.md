@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 0.3.0
+
+### Fixes
+- Fix: Compatibility with Vanilla Valheim v1.0.15 reintroduced
+- Fix: [Grid Mode] Terrain Modification Tools unintentionally produce Lava in The Ashlands
+
+### Known Issues
+- Jötunn 2.30.0 does not yet support the reworked Build Menu Tabs
+
 ## Version 0.2.3
 
 ### Improvements
