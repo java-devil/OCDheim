@@ -9,13 +9,13 @@ namespace OCDheim
 {
     public class KeyBinder : MonoBehaviour
     {
-        private static readonly ButtonConfig SnapModeKey = new ButtonConfig { Name = "SnapModeKey", Key = KeyCode.LeftShift };
-        private static readonly ButtonConfig SnapModeJoy = new ButtonConfig { Name = "SnapModeJoy", GamepadButton = InputManager.GamepadButton.RightShoulder };
-        private static readonly ButtonConfig GridModeKey = new ButtonConfig { Name = "GridModeKey", Key = KeyCode.LeftAlt };
-        private static readonly ButtonConfig GridModeJoy = new ButtonConfig { Name = "GridModeJoy", GamepadButton = InputManager.GamepadButton.RightStickButton };
-        private static readonly ButtonConfig PrecisionModeKey = new ButtonConfig { Name = "PrecisionModeKey", Key = KeyCode.Z };
-        private static readonly ButtonConfig PrecisionModeJoy = new ButtonConfig { Name = "PrecisionModeJoy", GamepadButton = InputManager.GamepadButton.ButtonWest };
+        private static ButtonConfig snapModeJoy { get; set; }
+        private static ButtonConfig gridModeKey { get; set; }
+        private static ButtonConfig gridModeJoy { get; set; }
+        private static ButtonConfig precisionModeKey { get; set; }
+        private static ButtonConfig precisionModeJoy { get; set; }
         
+        public const string SuppressSnapModeKey = "AltPlace";
         private const string MouseScrollWheel = "Mouse ScrollWheel";
         private const string JoyScrollUnlock = "JoyLTrigger";
         private const string JoyScrollDown = "JoyDPadDown";
@@ -27,7 +27,7 @@ namespace OCDheim
         private static bool _gridModeFreshlyEnabled;
         private static bool _gridModeFreshlyDisabled;
 
-        public static bool snapModeDisabled => ZInput.GetButton(SnapModeKey.Name) || ZInput.GetButton(SnapModeJoy.Name);
+        public static bool snapModeDisabled => ZInput.GetButton(SuppressSnapModeKey) || ZInput.GetButton(snapModeJoy.Name);
         public static bool snapModeEnabled => !snapModeDisabled;
 
         public static bool gridModeEnabled
@@ -47,22 +47,27 @@ namespace OCDheim
 
         private void Awake()
         {
-            InputManager.Instance.AddButton(OCDheim.GUID, SnapModeJoy);
-            InputManager.Instance.AddButton(OCDheim.GUID, SnapModeKey);
-            InputManager.Instance.AddButton(OCDheim.GUID, GridModeKey);
-            InputManager.Instance.AddButton(OCDheim.GUID, GridModeJoy);
-            InputManager.Instance.AddButton(OCDheim.GUID, PrecisionModeKey);
-            InputManager.Instance.AddButton(OCDheim.GUID, PrecisionModeJoy);
+            snapModeJoy = AddButton(new ButtonConfig { Name = nameof(snapModeJoy), GamepadConfig = Config.snapModeJoy });
+            gridModeKey = AddButton(new ButtonConfig { Name = nameof(gridModeKey), Config = Config.gridModeKey });
+            gridModeJoy = AddButton(new ButtonConfig { Name = nameof(gridModeJoy), GamepadConfig = Config.gridModeJoy });
+            precisionModeKey = AddButton(new ButtonConfig { Name = nameof(precisionModeKey), Config = Config.precisionModeKey });
+            precisionModeJoy = AddButton(new ButtonConfig { Name = nameof(precisionModeJoy), GamepadConfig = Config.precisionModeJoy });
+        }
+
+        private static ButtonConfig AddButton(ButtonConfig button)
+        {
+            InputManager.Instance.AddButton(OCDheim.GUID, button);
+            return button;
         }
 
         private void Update()
         {
-            var gridModeButton = ZInput.GetButtonDown(GridModeKey.Name)
-                                 || (snapModeEnabled && ZInput.GetButtonDown(GridModeJoy.Name));
+            var gridModeButton = ZInput.GetButtonDown(gridModeKey.Name)
+                                 || (snapModeEnabled && ZInput.GetButtonDown(gridModeJoy.Name));
             var toggleGridMode = (gridModeButton && (gridModeEnabled || player.HasConstructionToolEquipped()))
                                  || (gridModeEnabled && !player.HasConstructionToolEquipped());
-            var precisionModeButton = ZInput.GetButtonDown(PrecisionModeKey.Name)
-                                      || (snapModeEnabled && ZInput.GetButtonDown(PrecisionModeJoy.Name));
+            var precisionModeButton = ZInput.GetButtonDown(precisionModeKey.Name)
+                                      || (snapModeEnabled && ZInput.GetButtonDown(precisionModeJoy.Name));
             var togglePrecisionMode = (precisionModeButton && (precisionMode == SUPERIOR || player.HasBuildPieceEquipped()))
                                       || (precisionMode == SUPERIOR && !player.HasBuildPieceEquipped());
 

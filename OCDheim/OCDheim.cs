@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BepInEx;
 using HarmonyLib;
 using Jotunn.Configs;
@@ -7,17 +8,21 @@ using Jotunn.Managers;
 using Jotunn.Utils;
 using System.IO;
 using UnityEngine;
+using static OCDheim.PlayerHelpers;
 
 namespace OCDheim
 {
     [BepInPlugin(GUID, Name, Version)]
     [BepInDependency(Jotunn.Main.ModGuid)]
-    [NetworkCompatibility(CompatibilityLevel.ServerMustHaveMod, VersionStrictness.Minor)]
+    [SynchronizationMode(AdminOnlyStrictness.IfOnServer)]
+    [NetworkCompatibility(CompatibilityLevel.VersionCheckOnly, VersionStrictness.Minor)]
     public class OCDheim : BaseUnityPlugin
     {
         public const string GUID = "dymek.dev.OCDheim";
         private const string Name = "OCDheim";
         private const string Version = "0.3.0";
+        private const string RemoveTerrainModificationsPieceName = "Remove Terrain Modifications";
+        private const string RemoveTerrainModificationsPrefabName = "remove_terrain_modifications";
 
         public static AssetBundle resourceBundle { get; } = LoadResourceBundle();
         private Texture2D brick1x1 { get; } = LoadTextureFromDisk("brick_1x1.png");
@@ -25,6 +30,7 @@ namespace OCDheim
         private Texture2D brick2x2 { get; } = LoadTextureFromDisk("brick_2x2.png");
         private Texture2D brick1x2 { get; } = LoadTextureFromDisk("brick_1x2.png");
         private Texture2D brick4x2 { get; } = LoadTextureFromDisk("brick_4x2.png");
+        private List<Piece> bricks { get; } = new List<Piece>();
         private Harmony harmony { get; } = new Harmony(GUID);
 
         private static AssetBundle LoadResourceBundle()
@@ -58,6 +64,10 @@ namespace OCDheim
 
         private void Awake()
         {
+            global::OCDheim.Config.Bind(Config);
+            global::OCDheim.Config.additionalBuildPieces.SettingChanged += (_, args) => FlipBrickBuildPieceAvailability();
+            global::OCDheim.Config.removeTerrainModifications.SettingChanged += (_, args) => FlipRemoveTerrainModificationsAvailability();
+
             harmony.PatchAll();
             gameObject.AddComponent<KeyBinder>();
             PrefabManager.OnVanillaPrefabsAvailable += AddOCDheimToolPieces;
@@ -69,16 +79,29 @@ namespace OCDheim
         {
             //AddToolPiece<UndoModificationsOverlayVisualizer>("Undo Terrain Modification", "mud_road_v2", "Hoe", OverlayVisualizer.undo);
             //AddToolPiece<RedoModificationsOverlayVisualizer>("Redo Terrain Modification", "mud_road_v2", "Hoe", OverlayVisualizer.redo);
-            AddToolPiece<RemoveModificationsOverlayVisualizer>("Remove Terrain Modifications", "mud_road_v2", "Hoe", OverlayVisualizer.remove);
+            AddToolPiece<RemoveModificationsOverlayVisualizer>(RemoveTerrainModificationsPrefabName, RemoveTerrainModificationsPieceName, "mud_road_v2", "Hoe", OverlayVisualizer.remove);
+            FlipRemoveTerrainModificationsAvailability();
         }
 
-        private void AddToolPiece<TOverlayVisualizer>(string pieceName, string basePieceName, string pieceTable, Texture2D iconTexture, bool level = false, bool raise = false, bool smooth = false, bool paint = false) where TOverlayVisualizer: OverlayVisualizer
+        private void FlipRemoveTerrainModificationsAvailability()
         {
-            var pieceExists = PieceManager.Instance.GetPiece(pieceName);
+            var tool = PieceManager.Instance.GetPiece(RemoveTerrainModificationsPrefabName);
+            tool.Piece.m_enabled = global::OCDheim.Config.removeTerrainModifications.Value;
+
+            if (player)
+            {
+                player.UpdateKnownRecipesList();
+                player.UpdateAvailablePiecesList();
+            }
+        }
+
+        private void AddToolPiece<TOverlayVisualizer>(string prefabName, string pieceName, string basePieceName, string pieceTable, Texture2D iconTexture, bool level = false, bool raise = false, bool smooth = false, bool paint = false) where TOverlayVisualizer: OverlayVisualizer
+        {
+            var pieceExists = PieceManager.Instance.GetPiece(prefabName);
             if (pieceExists != null) { return; }
-            
+
             var pieceIcon = Sprite.Create(iconTexture, new Rect(0, 0, iconTexture.width, iconTexture.height), Vector2.zero);
-            var piece = new CustomPiece(pieceName, basePieceName, new PieceConfig
+            var piece = new CustomPiece(prefabName, basePieceName, new PieceConfig
             {
                 Name = pieceName,
                 Icon = pieceIcon,
@@ -123,9 +146,25 @@ namespace OCDheim
             brickConfig.PieceTable = "Hammer";
             brickConfig.Category = "HeavyBuild";
             brickConfig.Icon = brickIcon;
+            brickConfig.Enabled = global::OCDheim.Config.additionalBuildPieces.Value;
             brickConfig.AddRequirement(new RequirementConfig("Stone", brickPrice));
 
             PieceManager.Instance.AddPiece(new CustomPiece(brick, false, brickConfig));
+            bricks.Add(brick.GetComponent<Piece>());
+        }
+
+        private void FlipBrickBuildPieceAvailability()
+        {
+            foreach (var brick in bricks)
+            {
+                brick.m_enabled = global::OCDheim.Config.additionalBuildPieces.Value;
+            }
+
+            if (player)
+            {
+                player.UpdateKnownRecipesList();
+                player.UpdateAvailablePiecesList();
+            }
         }
 
         private void ModVanillaValheimTools()

@@ -1,15 +1,14 @@
 using System;
-using BepInEx.Logging;
 
 namespace OCDheim
 {
     public static class Logger
     {
-        private static LogLevel logLevel => LogLevel.Debug;
+        private static LoggingLevel logLevel => Config.loggingLevel.Value;
 
         public static void Debug(Func<string> func)
         {
-            if (logLevel >= LogLevel.Debug)
+            if (logLevel >= LoggingLevel.DEBUG)
             {
                 Jotunn.Logger.LogDebug(func());
             }
@@ -17,7 +16,7 @@ namespace OCDheim
         
         public static void Info(Func<string> func)
         {
-            if (logLevel >= LogLevel.Info)
+            if (logLevel >= LoggingLevel.INFO)
             {
                 Jotunn.Logger.LogInfo(func());
             }
@@ -25,7 +24,7 @@ namespace OCDheim
         
         public static void Warn(Func<string> func)
         {
-            if (logLevel >= LogLevel.Warning)
+            if (logLevel >= LoggingLevel.WARNING)
             {
                 Jotunn.Logger.LogWarning(func());
             }

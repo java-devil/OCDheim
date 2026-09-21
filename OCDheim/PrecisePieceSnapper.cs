@@ -28,7 +28,7 @@ namespace OCDheim
             var foundCodeToReplace = false;
             foreach (var instruction in instructions)
             {
-                foundCodeToRemove = foundCodeToRemove ? foundCodeToRemove : instruction.opcode == OpCodes.Ldstr && (string)instruction.operand == "AltPlace";
+                foundCodeToRemove = foundCodeToRemove ? foundCodeToRemove : instruction.opcode == OpCodes.Ldstr && (string)instruction.operand == KeyBinder.SuppressSnapModeKey;
                 if (foundCodeToRemove && !foundCodeToReplace)
                 {
                     foundCodeToReplace = foundCodeToReplace ? foundCodeToReplace : instruction.opcode == OpCodes.Call;
@@ -66,7 +66,7 @@ namespace OCDheim
         private static readonly List<Piece> NeighbourPieces = new List<Piece>();
 
         public static bool GridModeRequirementsSatisfied() => player.HasBuildPieceEquipped() || player.HasOverlayVisible();
-        public static bool SnapModeRequirementsSatisfied() => player.HasBuildPieceEquipped() && (buildPiece.Type() != CONSTRUCTION || KeyBinder.precisionMode == SUPERIOR);
+        public static bool SnapModeRequirementsSatisfied() => Config.additionalSnapPoints.Value && player.HasBuildPieceEquipped() && (buildPiece.Type() != CONSTRUCTION || KeyBinder.precisionMode == SUPERIOR);
         private static bool ShouldUsePlayerPositionAsGroundLevelReference() => player.HasLevelGroundTerraformToolEquipped() && KeyBinder.snapModeEnabled;
 
         [HarmonyPostfix]

@@ -2,6 +2,16 @@
 
 ## Version 0.3.0
 
+### Improvements
+- Major: No Server-Side installation of OCDheim required (check README)
+- Major: [Config File] Keybind Overrides
+- Major: [Config File] Functionality Toggles:
+  - Additional Snap Points
+  - Additional Build Pieces
+  - Remove Terrain Modifications
+  - Vertical Stacking/Piling of Stacks/Piles
+- Minor: [Config File] Logging Level Override
+
 ### Fixes
 - Fix: Compatibility with Vanilla Valheim v1.0.15 reintroduced
 - Fix: [Grid Mode] Terrain Modification Tools unintentionally produce Lava in The Ashlands

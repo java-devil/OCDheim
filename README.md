@@ -41,7 +41,7 @@ Then this is the mod for you.
 	- Black Marble Table
 	- *I'm open to other proposals*
 
-### GIRD MODE (press `ALT` [`LB` + `RS`] to toggle)
+### GRID MODE (press `ALT` [`LB` + `RS`] to toggle)
 - **The World Grid is visually imposed over terrain**
 ![World Grid](https://github.com/java-devil/OCDheim/blob/main/screenshots/world-grid.png?raw=true)
 - The Hoe and The Cultivator become tools of divine precision
@@ -83,17 +83,35 @@ Well now they do:
 	- Stone Wall 4x2 → Smooth Stone Wall 4x2
     - (_no equivalent_) → Smooth Stone Wall 2x2
 
-## Server-Side vs Client-Side Compatibility
-- The Server MUST run OCDheim if ANY Player runs OCDheim[^4]
-- if ALL Players run OCDheim → EVERYONE has FULL ACCESS to OCDheim functionality
-- if ONLY SOME Players run OCDheim → Players who DO NOT run OCDheim have NO ACCESS to OCDheim functionality
-- if ONLY SOME Players run OCDheim → Players who DO run OCDheim MUST refrain[^5] from using [Additional Build Pieces](#additional-build-pieces)
+## Config File
+- Manually modifiable in `${VALHEIM_DIR}/BepInEx/config/dymek.dev.OCDheim.cfg` (requires running Valheim with OCDheim once)
+- Automatically modifiable by pressing `F1` while [Configuration Manager](https://valheim.thunderstore.io/package/Azumatt/Official_BepInEx_ConfigurationManager/) is installed
+- Keybindings → every Key & Gamepad Button mentioned above is merely a default
+	- Every Key/Gamepad Button may be bound to a different Key/Gamepad Button
+	- Unbind (set to `None`) the `Grid Mode Key` / `Grid Mode Gamepad Button` to DISABLE [GRID MODE]
+	- Unbind (set to `None`) the `Precision Mode Key` / `Precision Mode Gamepad Button` to DISABLE [PRECISION MODE]
+    - To re-ENABLE [GRID MODE] or [PRECISION MODE] a restart of Valheim is required
+- Functionalities
+	- `Additional Snap Points` → ENABLED by default[^5]
+	- `Additional Build Pieces` → DISABLED by default[^4]
+	- `Remove Terrain Modifications` → ENABLED by default[^5]
+	- `Vertical Stacking/Piling of Stacks/Piles` → ENABLED by default[^4]
+- Logging
+	- `Logging Level` → `WARNING` by default
+
+## Compatibility with other Players
+- NEITHER The Server NOR other Players need to run OCDheim, however:
+	- if the first Player in proximity of [Additional Build Pieces](#additional-build-pieces) does NOT run OCDheim → the construction will collapse
+    - if the first Player in proximity of a [Vertical Stack of Stacks](#vertical-stacking-of-stacks) does NOT run OCDheim → the construction will collapse
+    - if the first Player in proximity of a terrain chunk does NOT run OCDheim -> terrain modification falls back to Vanilla Valheim (even for Players who DO run OCDheim)
+- if The Server runs OCDheim → EVERYONE who runs OCDheim MUST run the same minor version (`v0.3.0` will connect with `v0.3.1` vs `v0.3.0` will not connect with `v0.4.0`)
+
+## Compatibility with other Mods
+- The primary focus as for now is to improve the functionality offered by OCDheim.
+- No major effort to ensure cross-mod compatibility has been possible for now.
 
 ## Considered Possible Improvements
 - Config File
-	- Keybinding Overrides
-	- Functional Toggles
-	- Logging Levels
 	- Min/Max Terrain Modification Depth
 - Add `Smooth Slope` Tool → The Hoe (`MOUSE WHEEL SCROLL ↑ or ↓` to precisely fine-tune the Slope °)
 - if [GRID MODE] is ENABLED + The Cultivator is equipped → visualize The World Grid vs Terrain Type Grid drift (they do not fully overlap)
@@ -132,5 +150,5 @@ If you enjoy my work please consider a second to donate 😉
 [^1]: Every Build Piece that is NOT snappable in Vanilla Valheim (think: a Torch, a Forge or a Forge Cooler) - corresponds to the `Misc` `Crafting` and `Furniture` Tabs<br>
 [^2]: Every Build Piece that is snappable in Vanilla Valheim (think: a Wood Floor, a Darkwood Pole or a Black Marble Column) - corresponds to the `Build` and `Heavy Building` Tabs<br>
 [^3]: Every Build Piece suffixed with "Stack", "Pile" or "Barrel". Wood Stack, Corewood Stacks, Finewood Stacks, Bone Stacks, Stone Piles, Coal Piles, Coin Piles...<br>
-[^4]: This requirement MAY eventually be partially loosened<br>
-[^5]: There is no way as of now to enforce this Server-Side<br>
+[^4]: The Server decides for Everyone if The Server is running OCDheim. Everyone decides for themselves otherwise.<br>
+[^5]: Every Player decides for themselves (even if The Server is running OCDheim)<br>
