@@ -13,6 +13,8 @@ namespace OCDheim
         [HarmonyPatch(nameof(WearNTear.Start))]
         private static void MakePilesAsDurableAsWood(WearNTear __instance)
         {
+            if (!Config.pileUpper.Value) { return; }
+
             var pieceName = __instance.name;
             foreach (var suffix in ApplicableSuffixes)
             {
