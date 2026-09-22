@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1254" height="1254" viewBox="75.6 53.6 1102.8 1102.8" overflow="hidden">
+  <title>OCDheim — tighter engineering blueprint</title>
+  <desc>Symmetrical V on a uniform 92-unit grid. The 644-unit square has its four stroke centerlines exactly halfway between adjacent grid lines. All eight dashed dimension witnesses terminate at their arrow tips. No dimension labels. The central grid axes are subtly emphasized behind the V; no dashed axis crosses the letter. The crop is centered on the frame and displays five grid lines beyond each central axis; each sixth grid line is wholly outside the crop. The V bounds are vertically centered on y605. With positive grid coordinates upward, the top horizontal dimension is at +5 and the bottom at -5.</desc>
+  <rect width="1254" height="1254" fill="#0d2636" />
+  <g id="grid" fill="none" stroke="#2d6884" stroke-width="1.1">
+    <path d="M75 0 V1254" />
+    <path d="M167 0 V1254" />
+    <path d="M259 0 V1254" />
+    <path d="M351 0 V1254" />
+    <path d="M443 0 V1254" />
+    <path d="M535 0 V1254" />
+    <path d="M719 0 V1254" />
+    <path d="M811 0 V1254" />
+    <path d="M903 0 V1254" />
+    <path d="M995 0 V1254" />
+    <path d="M1087 0 V1254" />
+    <path d="M1179 0 V1254" />
+    <path d="M0 53 H1254" />
+    <path d="M0 145 H1254" />
+    <path d="M0 237 H1254" />
+    <path d="M0 329 H1254" />
+    <path d="M0 421 H1254" />
+    <path d="M0 513 H1254" />
+    <path d="M0 697 H1254" />
+    <path d="M0 789 H1254" />
+    <path d="M0 881 H1254" />
+    <path d="M0 973 H1254" />
+    <path d="M0 1065 H1254" />
+    <path d="M0 1157 H1254" />
+    <path d="M0 1249 H1254" />
+  </g>
+  <g id="main-axes" fill="none" stroke="#37758f" stroke-width="1.1">
+    <path d="M627 0 V1254" />
+    <path d="M0 605 H1254" />
+  </g>
+  <rect id="inner-square" x="305" y="283" width="644" height="644" fill="none" stroke="#67c3e8" stroke-width="4.2" />
+  <path id="v-mark" d="M322 200 H500 L463 244 L627 746 L791 244 L754 200 H932 L878 244 L627 1010 L376 244 Z" fill="#f4fbff" />
+  <g id="witness-lines" fill="none" stroke="#b9eafa" stroke-width="1.8" stroke-linecap="butt" stroke-dasharray="10 7">
+    <path d="M322 145 V200" />
+    <path d="M932 145 V200" />
+    <path d="M305 1065 V927" />
+    <path d="M949 1065 V927" />
+    <path d="M215 200 H322" />
+    <path d="M1039 200 H932" />
+    <path d="M215 1010 H305" />
+    <path d="M1039 1010 H949" />
+  </g>
+  <g id="dimension-baselines" fill="none" stroke="#b9eafa" stroke-width="1.8" stroke-linecap="butt">
+    <path d="M322 145 H932" />
+    <path d="M305 1065 H949" />
+    <path d="M215 200 V1010" />
+    <path d="M1039 200 V1010" />
+  </g>
+  <g id="arrowheads" fill="#b9eafa">
+    <path d="M322 145 L345 136.5 V153.5 Z" />
+    <path d="M932 145 L909 136.5 V153.5 Z" />
+    <path d="M305 1065 L328 1056.5 V1073.5 Z" />
+    <path d="M949 1065 L926 1056.5 V1073.5 Z" />
+    <path d="M215 200 L206.5 223 H223.5 Z" />
+    <path d="M215 1010 L206.5 987 H223.5 Z" />
+    <path d="M1039 200 L1030.5 223 H1047.5 Z" />
+    <path d="M1039 1010 L1030.5 987 H1047.5 Z" />
+  </g>
+</svg>

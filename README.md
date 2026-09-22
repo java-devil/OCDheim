@@ -1,10 +1,12 @@
 # OCDheim - DEATH TO EYEBALLING!
+![OCDheim](https://github.com/java-devil/OCDheim/blob/main/logo.png?raw=true)
+
 The purpose of this mod is for me, a person suffering from severe OCD, to be able to enjoy Valheim in its full Glory™ while keeping noninvasive, consistent and respectful of the intended OG experience.
 
 OCDheim is an opinionated collection of building and terraforming tools that bring 22nd-century-level laser precision to... your merry Viking settlement of 'Stokhölm' 🍻❤️
 
-Do you bleed from every orifice while trying to eyeball a line of torches, a wall of chests, or pin trophies on a wooden pole?
-Do you suffer a violent seizure while trying to level a ledge?
+Do you bleed from every orifice while trying to eyeball a line of torches, a wall of chests, or pin trophies on a wooden pole?<br>
+Do you suffer a violent seizure while trying to level a ledge?<br>
 Then this is the mod for you.
 
 # Propaganda Movie
