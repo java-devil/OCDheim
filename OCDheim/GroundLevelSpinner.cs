@@ -66,7 +66,7 @@ namespace OCDheim
         [HarmonyPatch(nameof(ZInput.GetMouseScrollWheel))]
         public static bool Prefix(ref float __result)
         {
-            if (player.HasRaiseGroundTerraformToolEquipped())
+            if (player.HasRaiseGroundTerraformToolEquipped() && KeyBinder.gridModeEnabled)
             {
                 __result = 0f;
                 return false;
