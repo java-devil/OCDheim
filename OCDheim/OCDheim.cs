@@ -20,7 +20,7 @@ namespace OCDheim
     {
         public const string GUID = "dymek.dev.OCDheim";
         private const string Name = "OCDheim";
-        private const string Version = "0.3.0";
+        private const string Version = "0.3.1";
         private const string RemoveTerrainModificationsPieceName = "Remove Terrain Modifications";
         private const string RemoveTerrainModificationsPrefabName = "remove_terrain_modifications";
 

@@ -43,7 +43,7 @@ Then this is the mod for you.
 	- Black Marble Table
 	- *I'm open to other proposals*
 
-### GRID MODE (press `ALT` [`LB` + `RS`] to toggle)
+### GRID MODE (press `ALT` [`RS`] to toggle)
 - **The World Grid is visually imposed over terrain**
 ![World Grid](https://github.com/java-devil/OCDheim/blob/main/screenshots/world-grid.png?raw=true)
 - The Hoe and The Cultivator become tools of divine precision
@@ -60,7 +60,7 @@ Then this is the mod for you.
 - All Seeds snap to the World Grid
 	- **Especially useful when:** well... quickly sowing while efficiently utilizing available terrain
 
-### PRECISION MODE (press `Z` [`LB` + `X`] to toggle)
+### PRECISION MODE (press `Z` [`X`] to toggle)
 - [Multiple Additional Snap Points](#additional-snap-points)
 - if [GRID MODE] is ALSO enabled + The Hoe    is equipped → no effect (since the minimal sensible AoE for terrain modification is a 1m x 1m tile)
 - if [GRID MODE] is ALSO enabled + The Hammer is equipped → The World Grid density is increased from 1m x 1m tiles to 0.5m x 0.5m tiles
@@ -125,7 +125,6 @@ Well now they do:
 	- Smelter → Blast Furnance
 	- Forge → Black Forge
 - Unlock Dvergr Build Pieces to enable full restoration of Dvergr structures
-- Show OCDheim keybind tips side by side with Vanilla Valheim keybind tips 
 - Performance improvements if proven necessary
 - Revise compatibility issues with other mods
 
@@ -140,9 +139,9 @@ https://github.com/java-devil/OCDheim/issues
 - ...and the Jötunn developers for being more helpful than is permissible by law (seriously if you ever decide to mod Valheim - look up their Wiki and their Discord)
 
 ## Feedback
-[![Discord](banners/discord.png)](https://discord.com/users/890153569905414144)
-[![GitHub](banners/github.png)](https://github.com/java-devil/OCDheim)
-[![Nexus Mods](banners/nexus.png)](https://www.nexusmods.com/valheim/mods/2087)
+[![Discord](https://github.com/java-devil/OCDheim/blob/main/banners/discord.png?raw=true)](https://discord.com/users/890153569905414144)
+[![GitHub](https://github.com/java-devil/OCDheim/blob/main/banners/github.png?raw=true)](https://github.com/java-devil/OCDheim)
+[![Nexus Mods](https://github.com/java-devil/OCDheim/blob/main/banners/nexus.png?raw=true)](https://www.nexusmods.com/valheim/mods/2087)
 
 ## Donations
 If you enjoy my work please consider a second to donate 😉
