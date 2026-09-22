@@ -10,16 +10,16 @@ namespace OCDheim
     public class KeyBinder : MonoBehaviour
     {
         private static ButtonConfig snapModeJoy { get; set; }
-        private static ButtonConfig gridModeKey { get; set; }
-        private static ButtonConfig gridModeJoy { get; set; }
-        private static ButtonConfig precisionModeKey { get; set; }
-        private static ButtonConfig precisionModeJoy { get; set; }
+        public static ButtonConfig gridModeKey { get; private set; }
+        public static ButtonConfig gridModeJoy { get; private set; }
+        public static ButtonConfig precisionModeKey { get; private set; }
+        public static ButtonConfig precisionModeJoy { get; private set; }
         
-        public const string SuppressSnapModeKey = "AltPlace";
         private const string MouseScrollWheel = "Mouse ScrollWheel";
-        private const string JoyScrollUnlock = "JoyLTrigger";
-        private const string JoyScrollDown = "JoyDPadDown";
-        private const string JoyScrollUp = "JoyDPadUp";
+        public const string SuppressSnapModeKey = "AltPlace";
+        public const string JoyScrollUnlock = "JoyLTrigger";
+        public const string JoyScrollDown = "JoyDPadDown";
+        public const string JoyScrollUp = "JoyDPadUp";
 
         private const float ScrollPrecision = 0.01f;
         
@@ -64,8 +64,8 @@ namespace OCDheim
         {
             var gridModeButton = ZInput.GetButtonDown(gridModeKey.Name)
                                  || (snapModeEnabled && ZInput.GetButtonDown(gridModeJoy.Name));
-            var toggleGridMode = (gridModeButton && (gridModeEnabled || player.HasConstructionToolEquipped()))
-                                 || (gridModeEnabled && !player.HasConstructionToolEquipped());
+            var toggleGridMode = (gridModeButton && (gridModeEnabled || player.HasGridModeToolEquipped()))
+                                 || (gridModeEnabled && !player.HasGridModeToolEquipped());
             var precisionModeButton = ZInput.GetButtonDown(precisionModeKey.Name)
                                       || (snapModeEnabled && ZInput.GetButtonDown(precisionModeJoy.Name));
             var togglePrecisionMode = (precisionModeButton && (precisionMode == SUPERIOR || player.HasBuildPieceEquipped()))

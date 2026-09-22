@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 0.3.1
+
+### Improvements
+- Minor: New Logo ❤️
+- Minor: OCDheim key hints visualized (whenever makes sense) side by side with Vanilla Valheim key hints
+
+### Fixes
+- Fix: Mouse Wheel Scroll ↑/↓ used to unintentionally +/- the Spinner by 0.01, 0.02, 0.03... on every log-out cycle
+
 ## Version 0.3.0
 
 ### Improvements
