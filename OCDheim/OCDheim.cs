@@ -175,6 +175,8 @@ namespace OCDheim
             PrefabManager.Instance.GetPrefab("paved_road_v2").AddComponent<PaveRoadOverlayVisualizer>();
             PrefabManager.Instance.GetPrefab("cultivate_v2").AddComponent<CultivateOverlayVisualizer>();
             PrefabManager.Instance.GetPrefab("replant_v2").AddComponent<SeedGrassOverlayVisualizer>();
+
+            PrefabManager.OnVanillaPrefabsAvailable -= ModVanillaValheimTools;
         }
     }
 }
