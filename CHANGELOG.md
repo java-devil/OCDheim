@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.3.2
+
+### Improvements
+- Major: [Config File] `Raise Terrain Limit` & `Lower Terrain Limit`
+
 ## Version 0.3.1
 
 ### Improvements
