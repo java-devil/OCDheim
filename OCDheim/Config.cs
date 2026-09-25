@@ -8,6 +8,7 @@ namespace OCDheim
     {
         private const string Keybinds = "Keybinds";
         private const string Functionalities = "Functionalities";
+        private const string TerrainModification = "Terrain Modification";
         private const string Logging = "Logging";
 
         private const string DecidedByServer = "The Server decides for Everyone if The Server is running OCDheim.";
@@ -16,7 +17,12 @@ namespace OCDheim
         private const string AdditionalSnapPointsDesc = "Snap Build Pieces to Additional Snap Points derived by OCDheim.";
         private static readonly string AdditionalBuildPiecesDesc = $"Show the Smooth Stone Build Pieces in the Build Menu. {DecidedByServer}";
         private const string RemoveTerrainModificationsDesc = "Show Remove Terrain Modifications in The Hoe.";
-        private static readonly string PileUpperDesc = $"Stacks, Piles and Barrels now stack, pile, and... erm... barrel(:P) vertically on top of each other. {DecidedByServer}"; 
+        private static readonly string PileUpperDesc = $"Stacks, Piles and Barrels now stack, pile, and... erm... barrel(:P) vertically on top of each other. {DecidedByServer}";
+
+        private static readonly string RaiseTerrainLimitDesc = $"How far terrain may be raised above its original level. Vanilla Valheim: 8m. {DecidedByServer}";
+        private static readonly string LowerTerrainLimitDesc = $"How far terrain may be lowered below its original level. Vanilla Valheim: 8m. {DecidedByServer}";
+        private static readonly AcceptableValueRange<float> RaiseTerrainBounds = new AcceptableValueRange<float>(0.0f, 256.0f);
+        private static readonly AcceptableValueRange<float> LowerTerrainBounds = new AcceptableValueRange<float>(0.0f, 256.0f);
 
         private const string LoggingLevelDesc = "No need to modify this *unless* you *know* you need to modify this ;)";
 
@@ -28,6 +34,9 @@ namespace OCDheim
         public static ConfigEntry<bool> additionalSnapPoints { get; private set; }
         public static ConfigEntry<bool> additionalBuildPieces { get; private set; }
         public static ConfigEntry<bool> removeTerrainModifications { get; private set; }
+
+        public static ConfigEntry<float> raiseTerrainLimit { get; private set; }
+        public static ConfigEntry<float> lowerTerrainLimit { get; private set; }
 
         public static ConfigEntry<KeyCode> gridModeKey { get; private set; }
         public static ConfigEntry<KeyCode> precisionModeKey { get; private set; }
@@ -44,6 +53,9 @@ namespace OCDheim
             removeTerrainModifications = config.Bind(Functionalities, "Remove Terrain Modifications", true, Describe(RemoveTerrainModificationsDesc, 2, false));
             pileUpper = config.Bind(Functionalities, "Vertical Stacking", true, Describe(PileUpperDesc, 1, true));
 
+            raiseTerrainLimit = config.Bind(TerrainModification, "Raise Terrain Limit", 8.0f, Describe(RaiseTerrainLimitDesc, 2, true, RaiseTerrainBounds));
+            lowerTerrainLimit = config.Bind(TerrainModification, "Lower Terrain Limit", 8.0f, Describe(LowerTerrainLimitDesc, 1, true, LowerTerrainBounds));
+
             snapModeJoy = config.Bind(Keybinds, "Snap Mode Gamepad Button", GamepadButton.RightShoulder, Describe(SnapModeJoyDesc, 5, false));
             gridModeKey = config.Bind(Keybinds, "Grid Mode Key", KeyCode.LeftAlt, Describe(GridModeDesc, 4, false));
             gridModeJoy = config.Bind(Keybinds, "Grid Mode Gamepad Button", GamepadButton.RightStickButton, Describe(GridModeDesc, 3, false));
@@ -53,10 +65,10 @@ namespace OCDheim
             loggingLevel = config.Bind(Logging, "Logging Level", LoggingLevel.WARNING, Describe(LoggingLevelDesc, 1, false));
         }
 
-        private static ConfigDescription Describe(string description, int order, bool adminOnly)
+        private static ConfigDescription Describe(string description, int order, bool adminOnly, AcceptableValueBase acceptableValues = null)
         {
             var attributes = new ConfigurationManagerAttributes { Order = order, IsAdminOnly = adminOnly };
-            return new ConfigDescription(description, null, attributes);
+            return new ConfigDescription(description, acceptableValues, attributes);
         }
     }
 }

@@ -98,6 +98,10 @@ Well now they do:
 	- `Additional Build Pieces` → DISABLED by default[^4]
 	- `Remove Terrain Modifications` → ENABLED by default[^5]
 	- `Vertical Stacking/Piling of Stacks/Piles` → ENABLED by default[^4]
+- Terrain Modification
+	- `Raise Terrain Limit` aka "How far terrain may be raised above its original level?" → `8m` by default (as in Vanilla Valheim)[^4]
+	- `Lower Terrain Limit` aka "How far terrain may be lowered below its original level?" → `8m` by default (as in Vanilla Valheim)[^4]
+    - `Raise Terrain Limit` and `Lower Terrain Limit` are applied only to NEW terrain modifications (OLD terrain modifications are preserved)
 - Logging
 	- `Logging Level` → `WARNING` by default
 
@@ -106,6 +110,8 @@ Well now they do:
 	- if the first Player in proximity of [Additional Build Pieces](#additional-build-pieces) does NOT run OCDheim → the construction will collapse
     - if the first Player in proximity of a [Vertical Stack of Stacks](#vertical-stacking-of-stacks) does NOT run OCDheim → the construction will collapse
     - if the first Player in proximity of a terrain chunk does NOT run OCDheim -> terrain modification falls back to Vanilla Valheim (even for Players who DO run OCDheim)
+    - if the first Player in proximity of a construction built on terrain modified beyond 8m does NOT run OCDheim → the construction will collapse
+        - ...however OCDheim will NOT collapse a construction built on terrain modified beyond its own terrain modification limits[^6]
 - if The Server runs OCDheim → EVERYONE who runs OCDheim MUST run the same minor version (`v0.3.0` will connect with `v0.3.1` vs `v0.3.0` will not connect with `v0.4.0`)
 
 ## Compatibility with other Mods
@@ -113,8 +119,6 @@ Well now they do:
 - No major effort to ensure cross-mod compatibility has been possible for now.
 
 ## Considered Possible Improvements
-- Config File
-	- Min/Max Terrain Modification Depth
 - Add `Smooth Slope` Tool → The Hoe (`MOUSE WHEEL SCROLL ↑ or ↓` to precisely fine-tune the Slope °)
 - if [GRID MODE] is ENABLED + The Cultivator is equipped → visualize The World Grid vs Terrain Type Grid drift (they do not fully overlap)
 - if [GRID MODE] is ENABLED + The Pickaxe is equipped → visualize on The World Grid where The Pickaxe is going to land
@@ -153,3 +157,7 @@ If you enjoy my work please consider a second to donate 😉
 [^3]: Every Build Piece suffixed with "Stack", "Pile" or "Barrel". Wood Stack, Corewood Stacks, Finewood Stacks, Bone Stacks, Stone Piles, Coal Piles, Coin Piles...<br>
 [^4]: The Server decides for Everyone if The Server is running OCDheim. Everyone decides for themselves otherwise.<br>
 [^5]: Every Player decides for themselves (even if The Server is running OCDheim)<br>
+[^6]: Modified by:
+- other Players running different mods
+- other Players running different settings of OCDheim
+- this Player running more restrictive settings of OCDheim than previously

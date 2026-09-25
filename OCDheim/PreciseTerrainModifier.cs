@@ -28,7 +28,7 @@ namespace OCDheim
             return true;
         }
 
-        public static void SmoothenTerrain(Vector3 worldPos, Heightmap hMap, TerrainComp compiler, ref float[] smoothΔ, ref bool[] modifiedHeight)
+        public static void SmoothenTerrain(Vector3 worldPos, Heightmap hMap, TerrainComp compiler, ref float[] ΔL, ref float[] ΔS, ref bool[] modifiedHeight)
         {
             Logger.Debug(() => "[INIT] Smooth Terrain Modification");
 
@@ -44,21 +44,21 @@ namespace OCDheim
                 {
                     var tileIndex = y * PTilesPerChunk + x;
                     var tileH = hMap.GetHeight(x, y);
-                    var Δh = referenceH - tileH;
-                    var oldΔh = smoothΔ[tileIndex];
-                    var newΔh = oldΔh + Δh;
-                    var roundedNewΔh = RoundToTwoDecimals(tileH, oldΔh, newΔh);
-                    var limΔh = Mathf.Clamp(roundedNewΔh, -1.0f, 1.0f);
-                    smoothΔ[tileIndex] = limΔh;
+                    var oldΔS = ΔS[tileIndex];
+                    var visibleOldΔS = TerrainLimiter.VisibleΔS(ΔL[tileIndex], oldΔS);
+                    var newΔS = visibleOldΔS + referenceH - tileH;
+                    var roundedNewΔS = RoundToTwoDecimals(tileH, visibleOldΔS, newΔS);
+                    var limitedNewΔS = TerrainLimiter.LimitΔS(ΔL[tileIndex], visibleOldΔS, roundedNewΔS);
+                    ΔS[tileIndex] = limitedNewΔS;
                     modifiedHeight[tileIndex] = true;
-                    Logger.Debug(() => $"tilePos: ({x}, {y}), tileH: {tileH}, Δh: {Δh}, oldΔh: {oldΔh}, newΔh: {newΔh}, roundedNewΔh: {roundedNewΔh}, limΔh: {limΔh}");
+                    Logger.Debug(() => $"tilePos: ({x}, {y}), tileH: {tileH}, referenceH: {referenceH}, oldΔS: {oldΔS}, visibleΔS: {visibleOldΔS}, newΔS: {newΔS}, roundedNewΔS: {roundedNewΔS}, limitedNewΔS: {limitedNewΔS}");
                 }
             }
 
             Logger.Debug(() => "[SUCCESS] Smooth Terrain Modification");
         }
 
-        public static void RaiseTerrain(Vector3 worldPos, Heightmap hMap, TerrainComp compiler, float power, ref float[] levelΔ, ref float[] smoothΔ, ref bool[] modifiedHeight)
+        public static void RaiseTerrain(Vector3 worldPos, Heightmap hMap, TerrainComp compiler, float power, ref float[] ΔL, ref float[] ΔS, ref bool[] modifiedHeight)
         {
             Logger.Debug(() => "[INIT] Raise Terrain Modification");
 
@@ -74,24 +74,24 @@ namespace OCDheim
                 {
                     var tileIndex = y * PTilesPerChunk + x;
                     var tileH = hMap.GetHeight(x, y);
-                    var Δh = referenceH - tileH;
-                    if (Δh >= 0)
+                    if (referenceH >= tileH)
                     {
-                        var oldLevelΔ = levelΔ[tileIndex];
-                        var oldSmoothΔ = smoothΔ[tileIndex];
-                        var newLevelΔ = oldLevelΔ + oldSmoothΔ + Δh;
-                        var newSmoothΔ = 0f;
-                        var roundedNewLevelΔ = RoundToTwoDecimals(tileH, oldLevelΔ + oldSmoothΔ, newLevelΔ + newSmoothΔ);
-                        var limitedNewLevelΔ = Mathf.Clamp(roundedNewLevelΔ, -16.0f, 16.0f);
-                        levelΔ[tileIndex] = limitedNewLevelΔ;
-                        smoothΔ[tileIndex] = newSmoothΔ;
+                        var oldΔL = ΔL[tileIndex];
+                        var oldΔS = ΔS[tileIndex];
+                        var oldΔH = TerrainLimiter.ΔH(oldΔL, oldΔS);
+                        var newΔL = oldΔH + referenceH - tileH;
+                        var newΔS = 0f;
+                        var roundedNewΔL = RoundToTwoDecimals(tileH, oldΔH, newΔL + newΔS);
+                        var limitedNewΔL = TerrainLimiter.LimitΔL(oldΔH, roundedNewΔL);
+                        ΔL[tileIndex] = limitedNewΔL;
+                        ΔS[tileIndex] = newΔS;
                         modifiedHeight[tileIndex] = true;
-                        Logger.Debug(() => $"tilePos: ({x}, {y}), tileH: {tileH}, Δh: {Δh}, oldLevelΔ: {oldLevelΔ}, oldSmoothΔ: {oldSmoothΔ}, newLevelΔ: {newLevelΔ}, newSmoothΔ: {newSmoothΔ}, roundedNewLevelΔ: {roundedNewLevelΔ}, limitedNewLevelΔ: {limitedNewLevelΔ}");
+                        Logger.Debug(() => $"tilePos: ({x}, {y}), tileH: {tileH}, referenceH: {referenceH}, oldΔL: {oldΔL}, oldΔS: {oldΔS}, newΔL: {newΔL}, newΔS: {newΔS}, roundedNewΔL: {roundedNewΔL}, limitedNewΔL: {limitedNewΔL}");
                     }
                     else
                     {
-                        Logger.Debug(() => "Declined to process tile: Δh < 0!");
-                        Logger.Debug(() => $"tilePos: ({x}, {y}), tileH: {tileH}, Δh: {Δh}");
+                        Logger.Debug(() => "Declined to process tile: tileH > referenceH!");
+                        Logger.Debug(() => $"tilePos: ({x}, {y}), tileH: {tileH}, referenceH: {referenceH}");
                     }
                 }
             }
@@ -121,7 +121,7 @@ namespace OCDheim
             Logger.Info(() => "[SUCCESS] Color Terrain Modification");
         }
 
-        private static void RemoveTerrainModifications(Vector3 worldPos, Heightmap hMap, ref float[] levelΔ, ref float[] smoothΔ, ref bool[] modifiedHeight)
+        private static void RemoveTerrainModifications(Vector3 worldPos, Heightmap hMap, ref float[] ΔL, ref float[] ΔS, ref bool[] modifiedHeight)
         {
             Logger.Debug(() => "[INIT] Remove Terrain Modifications");
             
@@ -135,8 +135,8 @@ namespace OCDheim
                 for (var y = yMin; y <= yMax; y++)
                 {
                     var tileIndex = y * PTilesPerChunk + x;
-                    levelΔ[tileIndex] = 0;
-                    smoothΔ[tileIndex] = 0;
+                    ΔL[tileIndex] = 0;
+                    ΔS[tileIndex] = 0;
                     modifiedHeight[tileIndex] = false;
                     Logger.Debug(() => $"tilePos: ({x}, {y}), tileIndex: {tileIndex}");
                 }
@@ -150,14 +150,14 @@ namespace OCDheim
             maxVal = Mathf.Min(val + AoESize, HTilesPerChunk);
         }
 
-        private static float RoundToTwoDecimals(float oldH, float oldΔh, float newΔh)
+        private static float RoundToTwoDecimals(float oldH, float oldΔ, float newΔ)
         {
-            var newH = oldH - oldΔh + newΔh;
+            var newH = oldH - oldΔ + newΔ;
             var roundedNewH = Mathf.Round(newH * 100) / 100;
-            var roundedNewΔh = roundedNewH - oldH + oldΔh;
-            Logger.Debug(() => $"oldH: {oldH}, oldΔH: {oldΔh}, newΔH: {newΔh}, newH: {newH}, roundedNewH: {roundedNewH}, roundedNewΔh: {roundedNewΔh}");
+            var roundedNewΔ = roundedNewH - oldH + oldΔ;
+            Logger.Debug(() => $"oldH: {oldH}, oldΔ: {oldΔ}, newΔ: {newΔ}, newH: {newH}, roundedNewH: {roundedNewH}, roundedNewΔ: {roundedNewΔ}");
 
-            return roundedNewΔh;
+            return roundedNewΔ;
         }
 
         private static void PositionRelativeTo(Vector3 chunkMid, Vector3 worldPos, out int x, out int y)
@@ -204,11 +204,11 @@ namespace OCDheim
         [HarmonyPrefix]
         [HarmonyPatch(typeof(TerrainComp))]
         [HarmonyPatch(nameof(TerrainComp.SmoothTerrain))]
-        private static bool Prefix(Vector3 worldPos, TerrainComp __instance, Heightmap ___m_hmap, ref float[] ___m_smoothDelta, ref bool[] ___m_modifiedHeight)
+        private static bool Prefix(Vector3 worldPos, TerrainComp __instance, Heightmap ___m_hmap, ref float[] ___m_levelDelta, ref float[] ___m_smoothDelta, ref bool[] ___m_modifiedHeight)
         {
             if (GridModeOverride.enabled)
             {
-                PreciseTerrainModifier.SmoothenTerrain(worldPos, ___m_hmap, __instance, ref ___m_smoothDelta, ref ___m_modifiedHeight);
+                PreciseTerrainModifier.SmoothenTerrain(worldPos, ___m_hmap, __instance, ref ___m_levelDelta, ref ___m_smoothDelta, ref ___m_modifiedHeight);
                 return false;
             }
 
