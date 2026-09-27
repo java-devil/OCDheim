@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.3.3
+
+### Fixes
+- Fix: [Grid Mode] Various Build Pieces used to clip into the Floor more than in intended by Vanilla Valheim
+- Fix: [Grid Mode] Various other Build Pieces used to clip into the Floor... less than intended by Vanilla Valheim 😉
+
 ## Version 0.3.2
 
 ### Improvements

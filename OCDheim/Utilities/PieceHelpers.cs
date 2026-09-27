@@ -33,7 +33,9 @@ namespace OCDheim
         public static PieceType Type(this Piece piece) => PieceTypes.LookUp(piece);
         public static PieceShape Shape(this Piece piece) => PieceShapes.LookUp(piece);
         public static ISide TopSide(this Piece piece) => Tables[piece.m_name].Invoke(piece);
-        public static bool IsGroundBound(this Piece piece) => piece.m_groundPiece || piece.m_clipGround || piece.m_clipEverything;
+        public static bool IsGroundBound(this Piece piece) => piece.m_groundPiece || piece.m_groundOnly || piece.m_cultivatedGroundOnly;
+        public static bool ClipsIntoBuildPieces(this Piece piece) => piece.m_clipEverything;
+        public static bool ClipsIntoGround(this Piece piece) => piece.m_clipGround;
 
         public static List<Vector3> PrimarySnapNodes(this Piece piece)
         {
@@ -74,17 +76,34 @@ namespace OCDheim
             Logger.Debug(() => $"PRIMARY SNAP NODES: {(PrimarySNs.Count > 0 ? string.Join(", ", PrimarySNs) : "NONE")} of Piece: '{piece.m_name}' {piece.transform.position}");
         }
         
-        public static Vector3 TopMiddle(this Piece piece)
+        public static float BottomLevel(this Piece piece) => piece.ExitTo(piece.transform.position + Vector3.down * PrecisionDrill.DropFromExosphere).y;
+        public static float TopLevel(this Piece piece) => piece.ExitTo(piece.transform.position + Vector3.up * PrecisionDrill.DropFromExosphere).y;
+        public static Vector3 TopMiddle(this Piece piece) => new Vector3(piece.transform.position.x, piece.TopLevel(), piece.transform.position.z);
+
+        public static Vector3 ExitTo(this Piece piece, Vector3 observer)
         {
+            var collisionDistance = float.PositiveInfinity;
+            var exitCollision = piece.transform.position;
             var colliders = piece.GetComponentsInChildren<Collider>();
-            var bounds = piece.GetComponentInChildren<Collider>().bounds;
             foreach (var collider in colliders)
             {
-                bounds.Encapsulate(collider.bounds);
+                if (collider.enabled && !collider.isTrigger)
+                {
+                    var meshCollider = collider as MeshCollider;
+                    if (meshCollider == null || meshCollider.convex)
+                    {
+                        var collision = collider.ClosestPoint(observer);
+                        var distance = Vector3.Distance(observer, collision);
+                        if (distance < collisionDistance)
+                        {
+                            exitCollision = collision;
+                            collisionDistance = distance;
+                        }
+                    }
+                }
             }
 
-            var y = bounds.max.y;
-            return new Vector3(piece.transform.position.x, y, piece.transform.position.z);
+            return exitCollision;
         }
 
         private static bool EverySnapNodeLiesOnExtremums(List<Vector3> snapNodes, Func<int, int, int, int, int, int, bool> condition)

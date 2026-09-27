@@ -143,8 +143,8 @@ namespace OCDheim
         {
             var h = 10;
             var pos = new Vector2(ov.worldPosition.x, ov.worldPosition.z);
-            var y = PrecisionDrill.DrillDownTillGround(pos).y;
-            var Δ = ov.worldPosition.y - y;
+            var floor = PrecisionDrill.DrillDownTillGround(pos);
+            var Δ = ov.worldPosition.y - floor.level;
 
             ov.scale = new Vector3(1.0f, Δ / h, 1.0f);
         }

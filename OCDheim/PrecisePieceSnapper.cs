@@ -59,6 +59,7 @@ namespace OCDheim
     public static class PrecisePieceSnapper
     {
         private const float NeighbourhoodSize = 2.5f;
+        private const float ClippingTolerance = 0.25f;
 
         private static readonly int PiecesOnly = UnityEngine.LayerMask.GetMask("piece");
         private static readonly int LayerMask = player.m_placeRayMask - UnityEngine.LayerMask.GetMask("piece_nonsolid");
@@ -97,10 +98,19 @@ namespace OCDheim
             else
             {
                 var drillCoords = new Vector2(xOnGrid, zOnGrid);
-                var posOnGrid = player.HasOverlayVisible() || buildPiece.IsGroundBound()
+                var floor = player.HasOverlayVisible() || buildPiece.IsGroundBound()
                     ? PrecisionDrill.DrillDownTillGround(drillCoords)
-                    : PrecisionDrill.DrillDownTillFloor(drillCoords, buildPiece.transform.position.y);
-                SnapExternallyHelper(buildPiece, posOnGrid, Vector3.up);
+                    : PrecisionDrill.DrillDownTillFloor(drillCoords, DetermineReferenceLevel(buildPiece), DetermineRequiredRoom(buildPiece));
+
+                var posOnGrid = new Vector3(xOnGrid, floor.level, zOnGrid);
+                if (!buildPiece.ClipsIntoBuildPieces() && !(buildPiece.ClipsIntoGround() && floor.isGround))
+                {
+                    SnapExternally(buildPiece, posOnGrid, Vector3.up);
+                }
+                else
+                {
+                    buildPiece.transform.position = posOnGrid;
+                }
             }
 
             if (player.HasOverlayVisible())
@@ -108,6 +118,13 @@ namespace OCDheim
                 FixVanillaValheimBugWithSpinningTerrainModificationVFX();
             }
         }
+
+        private static float DetermineReferenceLevel(Piece buildPiece) => buildPiece.ClipsIntoBuildPieces()
+            ? buildPiece.transform.position.y
+            : buildPiece.BottomLevel();
+
+        private static float DetermineRequiredRoom(Piece buildPiece) => buildPiece.ClipsIntoBuildPieces() ? 0.0f
+            : Mathf.Max(0.0f, buildPiece.TopLevel() - buildPiece.BottomLevel() - ClippingTolerance);
 
         private static (float xOnGrid, float zOnGrid) SnapToWorldGrid(Vector3 playerPoV, int precision)
         {
@@ -171,9 +188,9 @@ namespace OCDheim
             if (neighbourPieceOrNull is SnapTree.TraversalResult neighbourPiece)
             {
                 var (neighbourPieceExit, perpendicularToPlayerPoV) = DetermineNeighbourPieceExit(neighbourPiece.neighbourSnapNode, neighbourPiece.neighbourPiece);
-                if (!buildPiece.IsGroundBound())
+                if (!buildPiece.ClipsIntoBuildPieces())
                 {
-                    SnapExternallyHelper(buildPiece, neighbourPieceExit, perpendicularToPlayerPoV);
+                    SnapExternally(buildPiece, neighbourPieceExit, perpendicularToPlayerPoV);
                 }
                 else
                 {
@@ -182,10 +199,10 @@ namespace OCDheim
             }
         }
 
-        private static void SnapExternallyHelper(Piece buildPiece, Vector3 neighbourPieceExit, Vector3 perpendicularToPlayerPoV)
+        private static void SnapExternally(Piece buildPiece, Vector3 neighbourPieceExit, Vector3 perpendicularToPlayerPoV)
         {
             buildPiece.transform.position = neighbourPieceExit + perpendicularToPlayerPoV * 10;
-            var buildPieceExit = DeterminePieceExit(buildPiece, neighbourPieceExit);
+            var buildPieceExit = buildPiece.ExitTo(neighbourPieceExit);
         
             SnapPiecesByExits(buildPiece, buildPieceExit, neighbourPieceExit, perpendicularToPlayerPoV);
         }
@@ -195,7 +212,7 @@ namespace OCDheim
             var pokedNeighbourSnapNode = PokeToMiddle(neighbourSnapNode, neighbourPiece);
             var perpendicularToPlayerPoV = DeterminePerpendicularToPlayerPoVOn(pokedNeighbourSnapNode);
             var microscopicObserver = neighbourSnapNode + perpendicularToPlayerPoV;
-            var pokedNeighbourPieceExit = DeterminePieceExit(neighbourPiece, microscopicObserver);
+            var pokedNeighbourPieceExit = neighbourPiece.ExitTo(microscopicObserver);
 
             return (pokedNeighbourPieceExit, perpendicularToPlayerPoV);
         }
@@ -231,32 +248,6 @@ namespace OCDheim
             }
 
             return NeighbourPieces;
-        }
-
-        private static Vector3 DeterminePieceExit(Piece piece, Vector3 observer)
-        {
-            var collisionDistance = float.PositiveInfinity;
-            var exitCollision = piece.transform.position;
-            var colliders = piece.GetComponentsInChildren<Collider>();
-            foreach (var collider in colliders)
-            {
-                if (collider.enabled && !collider.isTrigger)
-                {
-                    var meshCollider = collider as MeshCollider;
-                    if (meshCollider == null || meshCollider.convex)
-                    {
-                        var collision = collider.ClosestPoint(observer);
-                        var distance = Vector3.Distance(observer, collision);
-                        if (distance < collisionDistance)
-                        {
-                            exitCollision = collision;
-                            collisionDistance = distance;
-                        }
-                    }
-                }
-            }
-
-            return exitCollision;
         }
 
         // Remove seemingly arbitrary deflections when hitting piece corners.

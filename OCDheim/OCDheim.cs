@@ -20,7 +20,7 @@ namespace OCDheim
     {
         public const string GUID = "dymek.dev.OCDheim";
         private const string Name = "OCDheim";
-        private const string Version = "0.3.2";
+        private const string Version = "0.3.3";
         private const string RemoveTerrainModificationsPieceName = "Remove Terrain Modifications";
         private const string RemoveTerrainModificationsPrefabName = "remove_terrain_modifications";
 
@@ -139,6 +139,7 @@ namespace OCDheim
             
             var brick = PrefabManager.Instance.CreateClonedPrefab($"stone_floor_{snakeSuffix}", "stone_floor_2x2");
             var brickIcon = Sprite.Create(iconTexture, new Rect(0, 0, iconTexture.width, iconTexture.height), Vector2.zero);
+            brick.GetComponent<Piece>().m_clipGround = false;
             brick.transform.localScale = brickScale;
 
             var brickConfig = new PieceConfig();
