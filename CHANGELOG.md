@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 0.3.4
+
+### Bumps
+- Bump: Jötunn v2.30.0 → v2.30.2
+
+### Improvements
+- Minor: [Config File] `Hover Info` (show or hide World Coords in [GRID MODE])
+
+### Fixes
+- Fix: Build Pieces used to flip from Valid/Invalid to Invalid/Valid on mouse micro-movements which did NOT move the Build Piece itself
+
 ## Version 0.3.3
 
 ### Fixes

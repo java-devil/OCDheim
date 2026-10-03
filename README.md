@@ -98,6 +98,7 @@ Well now they do:
 	- `Additional Build Pieces` → DISABLED by default[^4]
 	- `Remove Terrain Modifications` → ENABLED by default[^5]
 	- `Vertical Stacking/Piling of Stacks/Piles` → ENABLED by default[^4]
+	- `Hover Info` (show World Coords in [GRID MODE]) → ENABLED by default[^5], DISABLE for no-map runs
 - Terrain Modification
 	- `Raise Terrain Limit` aka "How far terrain may be raised above its original level?" → `8m` by default (as in Vanilla Valheim)[^4]
 	- `Lower Terrain Limit` aka "How far terrain may be lowered below its original level?" → `8m` by default (as in Vanilla Valheim)[^4]

@@ -18,6 +18,7 @@ namespace OCDheim
         private static readonly string AdditionalBuildPiecesDesc = $"Show the Smooth Stone Build Pieces in the Build Menu. {DecidedByServer}";
         private const string RemoveTerrainModificationsDesc = "Show Remove Terrain Modifications in The Hoe.";
         private static readonly string PileUpperDesc = $"Stacks, Piles and Barrels now stack, pile, and... erm... barrel(:P) vertically on top of each other. {DecidedByServer}";
+        private const string HoverInfoDesc = "Show World Coords on Terrain Modification Tools in Grid Mode. Likely should be DISABLED in no-map runs.";
 
         private static readonly string RaiseTerrainLimitDesc = $"How far terrain may be raised above its original level. Vanilla Valheim: 8m. {DecidedByServer}";
         private static readonly string LowerTerrainLimitDesc = $"How far terrain may be lowered below its original level. Vanilla Valheim: 8m. {DecidedByServer}";
@@ -34,6 +35,7 @@ namespace OCDheim
         public static ConfigEntry<bool> additionalSnapPoints { get; private set; }
         public static ConfigEntry<bool> additionalBuildPieces { get; private set; }
         public static ConfigEntry<bool> removeTerrainModifications { get; private set; }
+        public static ConfigEntry<bool> hoverInfo { get; private set; }
 
         public static ConfigEntry<float> raiseTerrainLimit { get; private set; }
         public static ConfigEntry<float> lowerTerrainLimit { get; private set; }
@@ -52,6 +54,7 @@ namespace OCDheim
             additionalBuildPieces = config.Bind(Functionalities, "Additional Build Pieces", false, Describe(AdditionalBuildPiecesDesc, 3, true));
             removeTerrainModifications = config.Bind(Functionalities, "Remove Terrain Modifications", true, Describe(RemoveTerrainModificationsDesc, 2, false));
             pileUpper = config.Bind(Functionalities, "Vertical Stacking", true, Describe(PileUpperDesc, 1, true));
+            hoverInfo = config.Bind(Functionalities, "Hover Info", true, Describe(HoverInfoDesc, 0, false));
 
             raiseTerrainLimit = config.Bind(TerrainModification, "Raise Terrain Limit", 8.0f, Describe(RaiseTerrainLimitDesc, 2, true, RaiseTerrainBounds));
             lowerTerrainLimit = config.Bind(TerrainModification, "Lower Terrain Limit", 8.0f, Describe(LowerTerrainLimitDesc, 1, true, LowerTerrainBounds));

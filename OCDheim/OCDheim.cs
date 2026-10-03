@@ -20,7 +20,7 @@ namespace OCDheim
     {
         public const string GUID = "dymek.dev.OCDheim";
         private const string Name = "OCDheim";
-        private const string Version = "0.3.3";
+        private const string Version = "0.3.4";
         private const string RemoveTerrainModificationsPieceName = "Remove Terrain Modifications";
         private const string RemoveTerrainModificationsPrefabName = "remove_terrain_modifications";
 
@@ -144,9 +144,10 @@ namespace OCDheim
 
             var brickConfig = new PieceConfig();
             brickConfig.Name = brickName;
+            brickConfig.Icon = brickIcon;
             brickConfig.PieceTable = "Hammer";
             brickConfig.Category = "HeavyBuild";
-            brickConfig.Icon = brickIcon;
+            brickConfig.Usage = new[] { PieceUsages.Building, PieceUsages.Wall };
             brickConfig.Enabled = global::OCDheim.Config.additionalBuildPieces.Value;
             brickConfig.AddRequirement(new RequirementConfig("Stone", brickPrice));
 

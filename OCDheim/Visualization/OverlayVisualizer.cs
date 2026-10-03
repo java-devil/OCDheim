@@ -180,11 +180,11 @@ namespace OCDheim
         protected override void InitializeOverlay()
         {
             hoverInfo.color = secondary.startColor;
-            hoverInfo.enabled = KeyBinder.gridModeEnabled;
         }
 
         protected override void OnRefresh()
         {
+            hoverInfo.enabled = KeyBinder.gridModeEnabled && Config.hoverInfo.Value;
             if (hoverInfo.enabled)
             {
                 hoverInfo.RotateToPlayer();
@@ -192,15 +192,8 @@ namespace OCDheim
             }
         }
 
-        protected override void OnEnableGrid()
-        {
-            hoverInfo.enabled = true;
-        }
-
-        protected override void OnDisableGrid()
-        {
-            hoverInfo.enabled = false;
-        }
+        protected override void OnEnableGrid() { }
+        protected override void OnDisableGrid() { }
     }
 
     public abstract class SecondaryEnabledOnGridModePrimaryDisabledOnGridMode : HoverInfoEnabled
