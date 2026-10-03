@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
 
@@ -56,6 +57,44 @@ namespace OCDheim
     }
 
     [HarmonyPatch]
+    public static class PrecisePieceSnapperBeforePlacementValidator
+    {
+        [HarmonyTranspiler]
+        [HarmonyPatch(typeof(Player))]
+        [HarmonyPatch(nameof(Player.UpdatePlacementGhost))]
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, MethodBase original)
+        {
+            var matcher = new CodeMatcher(instructions).MatchStartForward(
+                new CodeMatch(OpCodes.Ldarg_0),
+                new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(Player), nameof(Player.m_placementGhost))),
+                new CodeMatch(OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(GameObject), nameof(GameObject.transform))),
+                new CodeMatch(OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(Transform), nameof(Transform.position))),
+                new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(Location), nameof(Location.IsInsideNoBuildLocation))));
+
+            if (matcher.IsValid)
+            {
+                var snapBuildPiece = new CodeInstruction(OpCodes.Call, SymbolExtensions.GetMethodInfo(() => SnapBuildPiece()));
+                matcher.Instruction.MoveLabelsTo(snapBuildPiece);
+                matcher.Insert(snapBuildPiece);
+            }
+            else
+            {
+                Logger.Warn(() => $"FAILED to find Vanilla Valheim code to transpile in: {original.DeclaringType?.Name}.{original.Name}");
+            }
+
+            return matcher.InstructionEnumeration();
+        }
+
+        private static void SnapBuildPiece()
+        {
+            var surfaceOrNull = PrecisePieceSnapper.SnapBuildPiece();
+            if (surfaceOrNull is RaycastHit surface && player.HasBuildPieceEquipped())
+            {
+                player.m_placementStatus = PlacementValidator.Validate(buildPiece, surface);
+            }
+        }
+    }
+
     public static class PrecisePieceSnapper
     {
         private const float NeighbourhoodSize = 2.5f;
@@ -70,26 +109,32 @@ namespace OCDheim
         public static bool SnapModeRequirementsSatisfied() => Config.additionalSnapPoints.Value && player.HasBuildPieceEquipped() && (buildPiece.Type() != CONSTRUCTION || KeyBinder.precisionMode == SUPERIOR);
         private static bool ShouldUsePlayerPositionAsGroundLevelReference() => player.HasLevelGroundTerraformToolEquipped() && KeyBinder.snapModeEnabled;
 
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(Player))]
-        [HarmonyPatch(nameof(Player.UpdatePlacementGhost))]
-        private static void SnapBuildPiece()
+        // if a Build Piece was snapped to a Surface → the Surface
+        // if a Build Piece was NOT snapped to a Surface → null
+        public static RaycastHit? SnapBuildPiece()
         {
             if (KeyBinder.gridModeEnabled && GridModeRequirementsSatisfied())
             {
-                SnapToWorldGrid(buildPiece);
+                return SnapToWorldGrid(buildPiece);
             }
-            else if (KeyBinder.snapModeEnabled && SnapModeRequirementsSatisfied())
+            if (KeyBinder.snapModeEnabled && SnapModeRequirementsSatisfied())
             {
-                SnapToNeighbourPiece(buildPiece);
+                return SnapToNeighbourPiece(buildPiece);
             }
+
+            return null;
         }
 
-        private static void SnapToWorldGrid(Piece buildPiece)
+        private static RaycastHit? SnapToWorldGrid(Piece buildPiece)
         {
             var playerPoV = DeterminePlayerPoV();
             var precision = (int)KeyBinder.precisionMode;
             var (xOnGrid, zOnGrid) = SnapToWorldGrid(playerPoV, precision);
+
+            if (player.HasOverlayVisible())
+            {
+                FixVanillaValheimBugWithSpinningTerrainModificationVFX();
+            }
 
             if (ShouldUsePlayerPositionAsGroundLevelReference())
             {
@@ -111,12 +156,11 @@ namespace OCDheim
                 {
                     buildPiece.transform.position = posOnGrid;
                 }
+
+                return floor.drillStrike;
             }
 
-            if (player.HasOverlayVisible())
-            {
-                FixVanillaValheimBugWithSpinningTerrainModificationVFX();
-            }
+            return null;
         }
 
         private static float DetermineReferenceLevel(Piece buildPiece) => buildPiece.ClipsIntoBuildPieces()
@@ -151,23 +195,23 @@ namespace OCDheim
             return (xOnGrid, zOnGrid);
         }
 
-        private static void SnapToNeighbourPiece(Piece buildPiece)
+        private static RaycastHit? SnapToNeighbourPiece(Piece buildPiece)
         {
             var playerPoV = DeterminePlayerPoV();
             var neighbourPieces = FindNeighbourPieces(playerPoV);
             switch (buildPiece.Type())
             {
                 case CONSTRUCTION:
-                    SnapInternally(buildPiece, neighbourPieces);
-                    break;
+                    return SnapInternally(buildPiece, neighbourPieces);
                 case FURNITURE:
                 case TABLE:
-                    SnapExternally(buildPiece, neighbourPieces, playerPoV);
-                    break;
+                    return SnapExternally(buildPiece, neighbourPieces, playerPoV);
+                default:
+                    return null;
             }
         }
 
-        private static void SnapInternally(Piece buildPiece, List<Piece> neighbourPieces)
+        private static RaycastHit? SnapInternally(Piece buildPiece, List<Piece> neighbourPieces)
         {
             var snapNodeCoupleOrNull = KeyBinder.precisionMode == ORDINARY
                 ? SnapTree.FindNearestOrdinaryPrecisionSnapNodeCombinationOf(buildPiece, neighbourPieces) // TODO: This is dead code ATM
@@ -176,61 +220,62 @@ namespace OCDheim
             if (snapNodeCoupleOrNull is SnapTree.TraversalResult snapNodeCouple)
             {
                 buildPiece.transform.position += snapNodeCouple.neighbourSnapNode - snapNodeCouple.buildPieceSnapNode;
+                return DeterminePlayerPoVOn(snapNodeCouple.neighbourSnapNode, snapNodeCouple.neighbourPiece);
             }
+
+            return null;
         }
 
-        private static void SnapExternally(Piece buildPiece, List<Piece> neighbourPieces, Vector3 playerPoV)
+        private static RaycastHit? SnapExternally(Piece buildPiece, List<Piece> neighbourPieces, Vector3 playerPoV)
         {
             var neighbourPieceOrNull = KeyBinder.precisionMode == ORDINARY
                 ? SnapTree.FindNearestOrdinaryPrecisionSnapNodeTo(playerPoV, neighbourPieces)
                 : SnapTree.FindNearestSuperiorPrecisionSnapNodeTo(playerPoV, neighbourPieces);
 
-            if (neighbourPieceOrNull is SnapTree.TraversalResult neighbourPiece)
+            if (neighbourPieceOrNull is SnapTree.TraversalResult neighbourPiece && DeterminePlayerPoVOn(neighbourPiece.neighbourSnapNode, neighbourPiece.neighbourPiece) is RaycastHit playerPoVOnNeighbourPiece)
             {
-                var (neighbourPieceExit, perpendicularToPlayerPoV) = DetermineNeighbourPieceExit(neighbourPiece.neighbourSnapNode, neighbourPiece.neighbourPiece);
+                var microscopicObserver = neighbourPiece.neighbourSnapNode + playerPoVOnNeighbourPiece.normal;
+                var neighbourPieceExit = neighbourPiece.neighbourPiece.ExitTo(microscopicObserver);
                 if (!buildPiece.ClipsIntoBuildPieces())
                 {
-                    SnapExternally(buildPiece, neighbourPieceExit, perpendicularToPlayerPoV);
+                    SnapExternally(buildPiece, neighbourPieceExit, playerPoVOnNeighbourPiece.normal);
                 }
                 else
                 {
                     buildPiece.transform.position = neighbourPieceExit;
                 }
+
+                return playerPoVOnNeighbourPiece;
             }
+
+            return null;
         }
 
         private static void SnapExternally(Piece buildPiece, Vector3 neighbourPieceExit, Vector3 perpendicularToPlayerPoV)
         {
             buildPiece.transform.position = neighbourPieceExit + perpendicularToPlayerPoV * 10;
             var buildPieceExit = buildPiece.ExitTo(neighbourPieceExit);
-        
+
             SnapPiecesByExits(buildPiece, buildPieceExit, neighbourPieceExit, perpendicularToPlayerPoV);
-        }
-
-        private static (Vector3, Vector3) DetermineNeighbourPieceExit(SnapNode neighbourSnapNode, Piece neighbourPiece)
-        {
-            var pokedNeighbourSnapNode = PokeToMiddle(neighbourSnapNode, neighbourPiece);
-            var perpendicularToPlayerPoV = DeterminePerpendicularToPlayerPoVOn(pokedNeighbourSnapNode);
-            var microscopicObserver = neighbourSnapNode + perpendicularToPlayerPoV;
-            var pokedNeighbourPieceExit = neighbourPiece.ExitTo(microscopicObserver);
-
-            return (pokedNeighbourPieceExit, perpendicularToPlayerPoV);
         }
 
         private static Vector3 DeterminePlayerPoV()
         {
             var playerPosition = GameCamera.instance.transform.position;
             var playerPerspective = GameCamera.instance.transform.forward;
-            Physics.Raycast(playerPosition, playerPerspective, out var rayHit, PrecisionDrill.DropFromExosphere, LayerMask);
-            return rayHit.point;
+            var found = Physics.Raycast(playerPosition, playerPerspective, out var rayHit, PrecisionDrill.DropFromExosphere, LayerMask);
+
+            return found ? rayHit.point : buildPiece.transform.position;
         }
 
-        private static Vector3 DeterminePerpendicularToPlayerPoVOn(Vector3 snapNode)
+        private static RaycastHit? DeterminePlayerPoVOn(Vector3 neighbourSnapNode, Piece neighbourPiece)
         {
             var playerPosition = GameCamera.instance.transform.position;
-            var playerPerspectiveOnSnapNode = snapNode - playerPosition;
-            Physics.Raycast(playerPosition, playerPerspectiveOnSnapNode, out var rayHit, PrecisionDrill.DropFromExosphere, LayerMask);
-            return rayHit.normal;
+            var pokedNeighbourSnapNode = PokeToMiddle(neighbourSnapNode, neighbourPiece);
+            var playerPerspectiveOnSnapNode = pokedNeighbourSnapNode - playerPosition;
+            var found = Physics.Raycast(playerPosition, playerPerspectiveOnSnapNode, out var rayHit, PrecisionDrill.DropFromExosphere, LayerMask);
+
+            return found ? rayHit : (RaycastHit?) null;
         }
 
         private static List<Piece> FindNeighbourPieces(Vector3 playerPoV)

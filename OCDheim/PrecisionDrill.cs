@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using static OCDheim.PlayerHelpers;
+using static OCDheim.PrecisionDrill.Floor;
 
 namespace OCDheim
 {
@@ -18,17 +19,11 @@ namespace OCDheim
         {
             var drillFrom = WhereToDrillFrom(drillCoords);
             return Physics.Raycast(drillFrom, Vector3.down, out var drillStrike, DropFromExosphere, GroundLayerMask)
-                ? new Floor(drillStrike.point.y, true)
-                : new Floor(FallBack(drillCoords), true);
+                ? new Floor(drillStrike)
+                : FallBack(drillCoords);
         }
 
         private static Vector3 WhereToDrillFrom(Vector2 drillCoords) => new Vector3(drillCoords.x, DropFromExosphere, drillCoords.y);
-
-        private static float FallBack(Vector2 drillCoords)
-        {
-            Logger.Warn(() => $"[FAILED] Precision Drill for: {drillCoords}");
-            return player.transform.position.y;
-        }
 
         public static Floor DrillDownTillFloor(Vector2 drillCoords, float referenceLevel, float requiredRoom)
         {
@@ -65,7 +60,7 @@ namespace OCDheim
                 var floorLevel = drillStrike.point.y;
                 if (!ShouldSkipDueToInsufficientSize(drillStrike.collider) && !ShouldSkipDueToInsufficientRoom(floorLevel, roofLevel, requiredRoom))
                 {
-                    var floor = new Floor(floorLevel, IsGround(drillStrike.collider));
+                    var floor = new Floor(drillStrike);
                     floors.Add(floor);
                 }
                 var floorUnderside = UndersideOf(drillStrike.collider, drillCoords, floorLevel) ?? floorLevel;
@@ -76,8 +71,6 @@ namespace OCDheim
 
             return floors;
         }
-
-        private static bool IsGround(Collider collider) => (GroundLayerMask & (1 << collider.gameObject.layer)) != 0;
 
         private static float? UndersideOf(Collider collider, Vector2 drillCoords, float topLevel)
         {
@@ -110,12 +103,24 @@ namespace OCDheim
         {
             public float level { get; }
             public bool isGround { get; }
+            public RaycastHit? drillStrike { get; }
 
-            public Floor(float level, bool isGround)
+            public Floor(RaycastHit drillStrike) : this(drillStrike.point.y, IsGround(drillStrike.collider), drillStrike) {}
+
+            private Floor(float level, bool isGround, RaycastHit? drillStrike)
             {
                 this.level = level;
                 this.isGround = isGround;
+                this.drillStrike = drillStrike;
             }
+
+            public static Floor FallBack(Vector2 drillCoords)
+            {
+                Logger.Warn(() => $"[FAILED] Precision Drill for: {drillCoords}");
+                return new Floor(player.transform.position.y, true, null);
+            }
+
+            private static bool IsGround(Collider collider) => (GroundLayerMask & (1 << collider.gameObject.layer)) != 0;
         }
     }
 }
